@@ -286,19 +286,36 @@ body { font-family: 'Nunito', system-ui, sans-serif; background: #FFF8EE; min-he
 .leg { display: flex; align-items: center; gap: 5px; font-size: 13px; color: #aaa; font-weight: 700; }
 .leg-dot { width: 10px; height: 10px; border-radius: 3px; flex-shrink: 0; }
 
-/* ── CHINESE LINK CARDS ── */
+/* ── CHINESE PANEL ── */
+.zh-section-label {
+  font-size: 11px; font-weight: 900; color: #aaa; text-transform: uppercase;
+  letter-spacing: 0.06em; padding: 4px 2px 2px;
+}
+.zh-ep-row {
+  display: flex; align-items: center; gap: 12px;
+  background: #FFF5F8; border: 2px solid #FFD6E7; border-radius: 14px;
+  padding: 12px 14px; cursor: pointer;
+  transition: background 0.15s; -webkit-tap-highlight-color: transparent;
+}
+.zh-ep-row:hover { background: #FFE8F1; }
+.zh-ep-row.done { background: #F0FFF8; border-color: #C3EDDB; }
+.zh-ep-info { flex: 1; }
+.zh-ep-title { font-size: 15px; font-weight: 900; color: #C0392B; }
+.zh-ep-title.done { color: #bbb; text-decoration: line-through; }
+.zh-ep-sub { font-size: 12px; font-weight: 600; color: #aaa; margin-top: 2px; }
+.zh-play-btn { font-size: 16px; font-weight: 900; color: #E74C3C; flex-shrink: 0; }
 .zh-link-card {
-  display: flex; align-items: center; gap: 14px;
-  background: #FFF5F8; border: 2px solid #FFD6E7; border-radius: 16px;
+  display: flex; align-items: center; gap: 12px;
+  background: #FFF5F8; border: 2px solid #FFD6E7; border-radius: 14px;
   padding: 14px 16px; text-decoration: none; cursor: pointer;
   transition: background 0.15s; -webkit-tap-highlight-color: transparent;
 }
 .zh-link-card:hover { background: #FFE8F1; }
-.zh-link-card.zh-link-soon { opacity: 0.5; cursor: default; }
+.zh-link-card.zh-link-latejuly { background: #FEFBF0; border-color: #FCE8B2; }
+.zh-link-card.zh-link-latejuly:hover { background: #FEF5D5; }
 .zh-link-icon { font-size: 32px; flex-shrink: 0; }
 .zh-link-title { font-size: 18px; font-weight: 900; color: #C0392B; }
-.zh-link-sub { font-size: 13px; font-weight: 600; color: #888; margin-top: 2px; }
-.zh-link-hint { font-size: 12px; font-weight: 700; color: #E74C3C; margin-top: 4px; }
+.zh-link-sub { font-size: 12px; font-weight: 600; color: #888; margin-top: 2px; }
 
 /* ── IXL SKILL BADGES ── */
 .ixl-code-badge {
@@ -397,28 +414,56 @@ body { font-family: 'Nunito', system-ui, sans-serif; background: #FFF8EE; min-he
   <div class="ixl-dd-hdr">
     <div>
       <div class="ixl-dd-title">📖 中文資源 Chinese Resources</div>
-      <div class="ixl-dd-sub">每天看一集 · 1 video per day 🎯</div>
+      <div class="ixl-dd-sub" id="zh-dd-sub">每天看一集 · 1 video per day 🎯</div>
     </div>
     <button class="ixl-dd-close" onclick="closeZhDropdown()">✕</button>
   </div>
-  <div style="padding:12px 14px 18px;display:flex;flex-direction:column;gap:10px">
-    <a href="https://www.youtube.com/watch?v=PRd6_GEO24k&list=PLIchh2j0RAymn752l-0CKP8n4AJI1492L"
-       target="_blank" class="zh-link-card" onclick="closeZhDropdown()">
-      <div class="zh-link-icon">🎧</div>
+  <div style="padding:10px 14px 18px;display:flex;flex-direction:column;gap:6px">
+
+    <div class="zh-section-label">⭐ 必看 Required</div>
+
+    <!-- Ep 1 -->
+    <div class="zh-ep-row" id="zh_ep1-row" onclick="openZhVideo('https://www.youtube.com/watch?v=PRd6_GEO24k&list=PLIchh2j0RAymn752l-0CKP8n4AJI1492L','zh_ep1',event)">
+      <div class="ixl-dd-cb" id="zh_ep1-cb" onclick="event.stopPropagation();toggleZhEp('zh_ep1',event)"><span class="ixl-dd-cb-mark">✓</span></div>
+      <div class="zh-ep-info">
+        <div class="zh-ep-title">第1集 · 美猴王誕生</div>
+        <div class="zh-ep-sub">Birth of the Monkey King</div>
+      </div>
+      <div class="zh-play-btn">▶</div>
+    </div>
+
+    <!-- Ep 2 -->
+    <div class="zh-ep-row" id="zh_ep2-row" onclick="openZhVideo('https://www.youtube.com/watch?v=-kz1KoK4624&list=PLIchh2j0RAymn752l-0CKP8n4AJI1492L','zh_ep2',event)">
+      <div class="ixl-dd-cb" id="zh_ep2-cb" onclick="event.stopPropagation();toggleZhEp('zh_ep2',event)"><span class="ixl-dd-cb-mark">✓</span></div>
+      <div class="zh-ep-info">
+        <div class="zh-ep-title">第2集 · 美猴王學藝</div>
+        <div class="zh-ep-sub">The Monkey King Learns the Arts</div>
+      </div>
+      <div class="zh-play-btn">▶</div>
+    </div>
+
+    <div class="zh-section-label" style="margin-top:6px">🎉 選看 Optional (keep going!)</div>
+
+    <a href="https://www.youtube.com/playlist?list=PLIchh2j0RAymn752l-0CKP8n4AJI1492L"
+       target="_blank" class="zh-link-card" onclick="closeZhDropdown()" style="padding:11px 14px">
+      <div class="zh-link-icon" style="font-size:24px">🎧</div>
       <div class="zh-link-info">
-        <div class="zh-link-title">超級西遊記</div>
-        <div class="zh-link-sub">Super Journey to the West · audio series</div>
-        <div class="zh-link-hint">從美猴王開始 · start from Episode 1 ▶</div>
+        <div class="zh-link-title" style="font-size:16px">超級西遊記 全集</div>
+        <div class="zh-link-sub">Full playlist · pick up where you left off ▶</div>
       </div>
     </a>
-    <div class="zh-link-card zh-link-soon">
-      <div class="zh-link-icon">🔤</div>
+
+    <div class="zh-section-label" style="margin-top:6px">📅 七月底再看 Watch late July</div>
+
+    <a href="https://www.youtube.com/watch?v=_Ghtr4U4be4"
+       target="_blank" class="zh-link-card zh-link-latejuly" onclick="closeZhDropdown()" style="padding:11px 14px">
+      <div class="zh-link-icon" style="font-size:24px">🔤</div>
       <div class="zh-link-info">
-        <div class="zh-link-title">拼音練習</div>
-        <div class="zh-link-sub">Pinyin video · coming soon</div>
-        <div class="zh-link-hint">link to be added</div>
+        <div class="zh-link-title" style="font-size:16px">注音符號複習</div>
+        <div class="zh-link-sub">Pinyin/Zhuyin review · before 2nd grade starts</div>
       </div>
-    </div>
+    </a>
+
   </div>
 </div>
 
@@ -820,12 +865,45 @@ function buildIxlList(){
   });
 }
 // ── CHINESE PANEL ──
+const zhKey = (id) => `zh_${id}`;
+const isZhDone = (id) => !!S[zhKey(id)];
+function toggleZhEp(id, evt){
+  const nowDone = !isZhDone(id);
+  S[zhKey(id)] = nowDone;
+  save();
+  const row = document.getElementById(`${id}-row`);
+  const cb  = document.getElementById(`${id}-cb`);
+  const title = row?.querySelector('.zh-ep-title');
+  row?.classList.toggle('done', nowDone);
+  cb?.classList.toggle('on', nowDone);
+  title?.classList.toggle('done', nowDone);
+  // update sub-header count
+  const done = isZhDone('zh_ep1') + isZhDone('zh_ep2');
+  const sub = document.getElementById('zh-dd-sub');
+  if(sub) sub.textContent = done===2 ? '必看全部完成！🎉 All required done!' : `${done}/2 必看完成 · 每天看一集 🎯`;
+  if(evt){ const r=evt.currentTarget.getBoundingClientRect(); spawnConfetti(r.left+r.width/2,r.top+r.height/2,10); }
+  render();
+}
+function openZhVideo(url, id, evt){
+  if(evt) evt.stopPropagation();
+  window.open(url, '_blank');
+}
 function openZhDropdown(evt){
   if(evt) evt.stopPropagation();
   const dd=document.getElementById("zh-dd");
   const src=evt?.currentTarget||evt?.target;
   if(src){ const r=src.getBoundingClientRect(); dd.style.top=Math.min(r.bottom+8,window.innerHeight*0.28)+"px"; }
   else { dd.style.top="140px"; }
+  // sync checkbox states from saved data
+  ['zh_ep1','zh_ep2'].forEach(id=>{
+    const done=isZhDone(id);
+    document.getElementById(`${id}-row`)?.classList.toggle('done',done);
+    document.getElementById(`${id}-cb`)?.classList.toggle('on',done);
+    document.getElementById(`${id}-row`)?.querySelector('.zh-ep-title')?.classList.toggle('done',done);
+  });
+  const doneCnt = isZhDone('zh_ep1') + isZhDone('zh_ep2');
+  const sub=document.getElementById('zh-dd-sub');
+  if(sub) sub.textContent = doneCnt===2 ? '必看全部完成！🎉 All required done!' : `${doneCnt}/2 必看完成 · 每天看一集 🎯`;
   dd.classList.add("open");
   document.getElementById("zh-dd-backdrop").classList.add("open");
 }
