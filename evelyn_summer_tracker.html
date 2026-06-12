@@ -714,11 +714,27 @@ function toggle(wi,di,t,evt){
 }
 
 function toggleIxlMod(id,evt){
-  if(evt){const r=evt.currentTarget.getBoundingClientRect();spawnConfetti(r.left+r.width/2,r.top+r.height/2,10);}
-  S[ixlKey(id)]=!isIxlDone(id);
+  const nowDone = !isIxlDone(id);
+  S[ixlKey(id)] = nowDone;
   save();
-  buildIxlList(); // refresh dropdown in-place so checkbox updates immediately
-  render();       // update the X/76 counter on the Math row
+
+  // Targeted DOM update — toggle classes on the exact row that was tapped
+  const row = evt?.currentTarget;
+  if(row){
+    const r = row.getBoundingClientRect();
+    spawnConfetti(r.left+r.width/2, r.top+r.height/2, 10);
+    row.classList.toggle('done', nowDone);
+    row.querySelector('.ixl-dd-cb')?.classList.toggle('on', nowDone);
+    row.querySelector('.ixl-dd-name')?.classList.toggle('done', nowDone);
+  }
+
+  // Update the count line in the dropdown header
+  const cnt = getIxlCount();
+  const perDay = Math.ceil((IXL_TOTAL - cnt) / remainingMathDays());
+  const subEl = document.getElementById('ixl-dd-sub');
+  if(subEl) subEl.textContent = `${cnt}/${IXL_TOTAL} done · do ~${perDay} today 🎯`;
+
+  render(); // update the X/76 badge on the Math/IXL task row
 }
 
 // ── VIEW SWITCH ──
