@@ -716,7 +716,9 @@ function toggle(wi,di,t,evt){
 function toggleIxlMod(id,evt){
   if(evt){const r=evt.currentTarget.getBoundingClientRect();spawnConfetti(r.left+r.width/2,r.top+r.height/2,10);}
   S[ixlKey(id)]=!isIxlDone(id);
-  save(); render();
+  save();
+  buildIxlList(); // refresh dropdown in-place so checkbox updates immediately
+  render();       // update the X/76 counter on the Math row
 }
 
 // ── VIEW SWITCH ──
