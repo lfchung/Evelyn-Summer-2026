@@ -895,22 +895,25 @@ function renderTodayView(){
       const checked=isDone(wi,di,t);
       const def=T[t];
       if(t==="math" && !locked){
-        // Math/IXL: row tap opens dropdown; checkbox tap toggles done independently
         const cnt=getIxlCount();
+        const perDay=Math.ceil((IXL_TOTAL-cnt)/remainingMathDays());
         html+=`<div class="big-task${checked?" done-task":""}" onclick="openIxlDropdown(event)">
           <div class="big-cb${checked?" on":""}" onclick="event.stopPropagation();toggle(${wi},${di},'math',event)"><span class="big-cb-mark">✓</span></div>
           <div class="big-t-info">
-            <div class="big-t-en${checked?" done":""}" style="color:${checked?"#ccc":def.color}">${def.emoji} ${def.en}</div>
-            <div class="big-t-zh${checked?" done":""}">${def.zh} <span class="big-t-min">${def.min}</span></div>
+            <div class="big-t-en${checked?" done":""}" style="color:${checked?"#ccc":def.color}">${def.emoji} ${def.zh}</div>
+            <div class="big-t-zh${checked?" done":""}">${def.en} <span class="big-t-min">${def.min}</span></div>
           </div>
-          <div style="font-size:12px;font-weight:800;color:#7AAAE0;flex-shrink:0">${cnt}/${IXL_TOTAL} ▾</div>
+          <div style="text-align:right;flex-shrink:0">
+            <div style="font-size:13px;font-weight:800;color:#7AAAE0">${cnt}/${IXL_TOTAL} ▾</div>
+            <div style="font-size:11px;font-weight:800;color:#FD79A8;margin-top:2px">~${perDay} 今天 🎯</div>
+          </div>
         </div>`;
       } else {
         html+=`<div class="big-task${checked?" done-task":""}${locked?" locked-task":""}" onclick="${locked?"":"toggle("+wi+","+di+",'"+t+"',event)"}">
           <div class="big-cb${checked?" on":""}"><span class="big-cb-mark">✓</span></div>
           <div class="big-t-info">
-            <div class="big-t-en${checked?" done":""}" style="color:${checked?"#ccc":def.color}">${def.emoji} ${def.en}</div>
-            <div class="big-t-zh${checked?" done":""}">${def.zh} <span class="big-t-min">${def.min}</span></div>
+            <div class="big-t-en${checked?" done":""}" style="color:${checked?"#ccc":def.color}">${def.emoji} ${def.zh}</div>
+            <div class="big-t-zh${checked?" done":""}">${def.en} <span class="big-t-min">${def.min}</span></div>
           </div>
         </div>`;
       }
@@ -968,8 +971,8 @@ function renderWeekView(){
         html+=`<div class="${cls2}" ${handler}>
           <div class="cb${checked?" on":""}"><span class="cb-mark">✓</span></div>
           <div class="t-info">
-            <div class="t-en${checked?" done":""}" style="color:${checked?"#ccc":def.color}">${def.emoji} ${def.en}</div>
-            <div class="t-zh${checked?" done":""}">${def.zh} <span class="t-min">${def.min}</span></div>
+            <div class="t-en${checked?" done":""}" style="color:${checked?"#ccc":def.color}">${def.emoji} ${def.zh}</div>
+            <div class="t-zh${checked?" done":""}">${def.en} <span class="t-min">${def.min}</span></div>
           </div>
         </div>`;
       });
