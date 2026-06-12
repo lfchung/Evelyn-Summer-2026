@@ -286,6 +286,20 @@ body { font-family: 'Nunito', system-ui, sans-serif; background: #FFF8EE; min-he
 .leg { display: flex; align-items: center; gap: 5px; font-size: 13px; color: #aaa; font-weight: 700; }
 .leg-dot { width: 10px; height: 10px; border-radius: 3px; flex-shrink: 0; }
 
+/* ── CHINESE LINK CARDS ── */
+.zh-link-card {
+  display: flex; align-items: center; gap: 14px;
+  background: #FFF5F8; border: 2px solid #FFD6E7; border-radius: 16px;
+  padding: 14px 16px; text-decoration: none; cursor: pointer;
+  transition: background 0.15s; -webkit-tap-highlight-color: transparent;
+}
+.zh-link-card:hover { background: #FFE8F1; }
+.zh-link-card.zh-link-soon { opacity: 0.5; cursor: default; }
+.zh-link-icon { font-size: 32px; flex-shrink: 0; }
+.zh-link-title { font-size: 18px; font-weight: 900; color: #C0392B; }
+.zh-link-sub { font-size: 13px; font-weight: 600; color: #888; margin-top: 2px; }
+.zh-link-hint { font-size: 12px; font-weight: 700; color: #E74C3C; margin-top: 4px; }
+
 /* ── IXL SKILL BADGES ── */
 .ixl-code-badge {
   font-size: 11px; font-weight: 900; letter-spacing: 0.04em;
@@ -375,6 +389,37 @@ body { font-family: 'Nunito', system-ui, sans-serif; background: #FFF8EE; min-he
   <div class="leg"><div class="leg-dot" style="background:#e17055"></div>📖 Chinese 中文 15分</div>
   <div class="leg"><div class="leg-dot" style="background:#d4a017"></div>🎻 Violin 小提琴 20分</div>
   <div class="leg"><div class="leg-dot" style="background:#a29bfe"></div>📕 Reading 閱讀 20分</div>
+</div>
+
+<!-- CHINESE RESOURCES PANEL -->
+<div class="ixl-dd-backdrop" id="zh-dd-backdrop" onclick="closeZhDropdown()"></div>
+<div class="ixl-dd" id="zh-dd">
+  <div class="ixl-dd-hdr">
+    <div>
+      <div class="ixl-dd-title">📖 中文資源 Chinese Resources</div>
+      <div class="ixl-dd-sub">每天看一集 · 1 video per day 🎯</div>
+    </div>
+    <button class="ixl-dd-close" onclick="closeZhDropdown()">✕</button>
+  </div>
+  <div style="padding:12px 14px 18px;display:flex;flex-direction:column;gap:10px">
+    <a href="https://www.youtube.com/watch?v=PRd6_GEO24k&list=PLIchh2j0RAymn752l-0CKP8n4AJI1492L"
+       target="_blank" class="zh-link-card" onclick="closeZhDropdown()">
+      <div class="zh-link-icon">🎧</div>
+      <div class="zh-link-info">
+        <div class="zh-link-title">超級西遊記</div>
+        <div class="zh-link-sub">Super Journey to the West · audio series</div>
+        <div class="zh-link-hint">從美猴王開始 · start from Episode 1 ▶</div>
+      </div>
+    </a>
+    <div class="zh-link-card zh-link-soon">
+      <div class="zh-link-icon">🔤</div>
+      <div class="zh-link-info">
+        <div class="zh-link-title">拼音練習</div>
+        <div class="zh-link-sub">Pinyin video · coming soon</div>
+        <div class="zh-link-hint">link to be added</div>
+      </div>
+    </div>
+  </div>
 </div>
 
 <!-- IXL FLOATING DROPDOWN -->
@@ -774,6 +819,21 @@ function buildIxlList(){
       </div>`;
   });
 }
+// ── CHINESE PANEL ──
+function openZhDropdown(evt){
+  if(evt) evt.stopPropagation();
+  const dd=document.getElementById("zh-dd");
+  const src=evt?.currentTarget||evt?.target;
+  if(src){ const r=src.getBoundingClientRect(); dd.style.top=Math.min(r.bottom+8,window.innerHeight*0.28)+"px"; }
+  else { dd.style.top="140px"; }
+  dd.classList.add("open");
+  document.getElementById("zh-dd-backdrop").classList.add("open");
+}
+function closeZhDropdown(){
+  document.getElementById("zh-dd").classList.remove("open");
+  document.getElementById("zh-dd-backdrop").classList.remove("open");
+}
+
 function openIxlDropdown(evt){
   if(evt) evt.stopPropagation();
   const dd=document.getElementById("ixl-dd");
@@ -907,6 +967,15 @@ function renderTodayView(){
             <div style="font-size:13px;font-weight:800;color:#7AAAE0">${cnt}/${IXL_TOTAL} ▾</div>
             <div style="font-size:11px;font-weight:800;color:#FD79A8;margin-top:2px">~${perDay} 今天 🎯</div>
           </div>
+        </div>`;
+      } else if(t==="chinese" && !locked){
+        html+=`<div class="big-task${checked?" done-task":""}" onclick="openZhDropdown(event)">
+          <div class="big-cb${checked?" on":""}" onclick="event.stopPropagation();toggle(${wi},${di},'chinese',event)"><span class="big-cb-mark">✓</span></div>
+          <div class="big-t-info">
+            <div class="big-t-en${checked?" done":""}" style="color:${checked?"#ccc":def.color}">${def.emoji} ${def.zh}</div>
+            <div class="big-t-zh${checked?" done":""}">${def.en} <span class="big-t-min">${def.min}</span></div>
+          </div>
+          <div style="font-size:13px;font-weight:800;color:#E74C3C;flex-shrink:0">▶ 看影片</div>
         </div>`;
       } else {
         html+=`<div class="big-task${checked?" done-task":""}${locked?" locked-task":""}" onclick="${locked?"":"toggle("+wi+","+di+",'"+t+"',event)"}">
