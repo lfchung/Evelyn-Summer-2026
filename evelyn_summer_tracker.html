@@ -34,13 +34,6 @@ body { font-family: 'Nunito', system-ui, sans-serif; background: #FFF8EE; min-he
   background: #fff; border-bottom: 2px solid #F0EAD6;
   padding: 10px 20px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
 }
-.view-btns { display: flex; gap: 6px; flex-shrink: 0; }
-.vbtn {
-  padding: 7px 16px; border-radius: 20px; font-size: 14px; font-weight: 800;
-  cursor: pointer; border: 2px solid #E8E0CC; background: transparent; color: #aaa;
-  transition: all 0.15s; font-family: 'Nunito', sans-serif;
-}
-.vbtn.on { background: #6C5CE7; color: #fff; border-color: #6C5CE7; }
 .wk-tabs { display: flex; gap: 5px; overflow-x: auto; scrollbar-width: none; flex: 1; }
 .wk-tabs::-webkit-scrollbar { display: none; }
 .wk-tab {
@@ -52,9 +45,21 @@ body { font-family: 'Nunito', system-ui, sans-serif; background: #FFF8EE; min-he
 .wk-tab.done:not(.on) { background: #D4F5E9; color: #085041; border-color: #00B894; }
 .wk-tab.locked { opacity: 0.6; }
 
-/* ── TODAY VIEW ── */
-.today-view { padding: 18px 20px 28px; display: none; }
-.today-view.on { display: block; }
+/* ── MAIN CONTENT ── */
+.main-content { padding: 18px 20px 28px; }
+.day-detail-back {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: #F5F3FF; border: 2px solid #D6CEFF; border-radius: 20px;
+  padding: 6px 14px; font-size: 13px; font-weight: 800; color: #6C5CE7;
+  cursor: pointer; font-family: 'Nunito', sans-serif; margin-bottom: 14px;
+  transition: background 0.15s;
+}
+.day-detail-back:hover { background: #EBE8FF; }
+.today-badge {
+  display: inline-block; font-size: 11px; font-weight: 900;
+  background: #6C5CE7; color: #fff; border-radius: 8px;
+  padding: 2px 8px; margin-left: 8px; vertical-align: middle;
+}
 
 .today-hd { margin-bottom: 16px; }
 .today-dow-row { display: flex; align-items: center; gap: 8px; }
@@ -189,8 +194,7 @@ body { font-family: 'Nunito', system-ui, sans-serif; background: #FFF8EE; min-he
 .ixl-mod-desc { font-size: 12px; color: #bbb; font-weight: 600; margin-top: 3px; }
 
 /* ── WEEK VIEW ── */
-.week-view { padding: 16px 20px 28px; display: none; }
-.week-view.on { display: block; }
+.week-view { padding: 0; }
 
 .wk-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; flex-wrap: wrap; gap: 8px; }
 .wk-dates { font-size: 17px; font-weight: 800; color: #333; }
@@ -214,6 +218,7 @@ body { font-family: 'Nunito', system-ui, sans-serif; background: #FFF8EE; min-he
 .day.complete { border-color: #00B894; box-shadow: 0 2px 8px rgba(0,184,148,0.2); }
 .day.is-free { background: #FFFBF0; border: 2.5px dashed #F0EAD6; box-shadow: none; }
 .day.is-locked { /* fully visible, tasks just non-interactive */ }
+.day.is-today { border-color: #6C5CE7; box-shadow: 0 2px 12px rgba(108,92,231,0.18); }
 
 .day-accent { height: 6px; }
 .acc-Mon { background: linear-gradient(90deg,#6C5CE7,#a29bfe); }
@@ -300,10 +305,10 @@ body { font-family: 'Nunito', system-ui, sans-serif; background: #FFF8EE; min-he
 .zh-ep-row:hover { background: #FFE8F1; }
 .zh-ep-row.done { background: #F0FFF8; border-color: #C3EDDB; }
 .zh-ep-info { flex: 1; }
-.zh-ep-title { font-size: 15px; font-weight: 900; color: #C0392B; }
+.zh-ep-title { font-size: 15px; font-weight: 900; color: #e67e22; }
 .zh-ep-title.done { color: #bbb; text-decoration: line-through; }
 .zh-ep-sub { font-size: 12px; font-weight: 600; color: #aaa; margin-top: 2px; }
-.zh-play-btn { font-size: 16px; font-weight: 900; color: #E74C3C; flex-shrink: 0; }
+.zh-play-btn { font-size: 16px; font-weight: 900; color: #e67e22; flex-shrink: 0; }
 .zh-link-card {
   display: flex; align-items: center; gap: 12px;
   background: #FFF5F8; border: 2px solid #FFD6E7; border-radius: 14px;
@@ -314,7 +319,7 @@ body { font-family: 'Nunito', system-ui, sans-serif; background: #FFF8EE; min-he
 .zh-link-card.zh-link-latejuly { background: #FEFBF0; border-color: #FCE8B2; }
 .zh-link-card.zh-link-latejuly:hover { background: #FEF5D5; }
 .zh-link-icon { font-size: 32px; flex-shrink: 0; }
-.zh-link-title { font-size: 18px; font-weight: 900; color: #C0392B; }
+.zh-link-title { font-size: 18px; font-weight: 900; color: #e67e22; }
 .zh-link-sub { font-size: 12px; font-weight: 600; color: #888; margin-top: 2px; }
 
 /* ── IXL SKILL BADGES ── */
@@ -401,44 +406,11 @@ body { font-family: 'Nunito', system-ui, sans-serif; background: #FFF8EE; min-he
 
 <!-- NAV BAR -->
 <div class="nav-bar">
-  <div class="view-btns">
-    <button class="vbtn on" id="vbtn-today" onclick="switchView('today')">📅 今天</button>
-    <button class="vbtn" id="vbtn-week" onclick="switchView('week')">📆 本週</button>
-  </div>
   <div class="wk-tabs" id="wk-tabs"></div>
 </div>
 
-<!-- TODAY VIEW -->
-<div class="today-view on" id="today-view">
-  <div id="today-content"></div>
-</div>
-
-<!-- WEEK VIEW -->
-<div class="week-view" id="week-view">
-  <div class="wk-header">
-    <span class="wk-dates" id="wk-dates-label">—</span>
-    <div style="display:flex;gap:8px;flex-wrap:wrap">
-      <button class="wk-ixl-btn" id="wk-ixl-btn" onclick="openIxlDropdown(event)">
-        <span class="wk-ixl-lbl">📚 IXL</span>
-        <span class="wk-ixl-cnt" id="wk-ixl-cnt">0/76</span>
-      </button>
-      <button class="wk-zh-btn" onclick="openZhDropdown(event)">
-        <span class="wk-zh-lbl">📖 中文影片</span>
-      </button>
-    </div>
-  </div>
-  <div class="days" id="days-grid"></div>
-</div>
-
-<!-- LEGEND -->
-<div class="legend">
-  <div class="leg"><div class="leg-dot" style="background:#6C5CE7"></div>🎹 Piano 鋼琴 20分</div>
-  <div class="leg"><div class="leg-dot" style="background:#0984e3"></div>🔢 Math 數學 30分</div>
-  <div class="leg"><div class="leg-dot" style="background:#00a651"></div>💻 Coding 程式 30分</div>
-  <div class="leg"><div class="leg-dot" style="background:#e17055"></div>📖 Chinese 中文 15分</div>
-  <div class="leg"><div class="leg-dot" style="background:#d4a017"></div>🎻 Violin 小提琴 20分</div>
-  <div class="leg"><div class="leg-dot" style="background:#a29bfe"></div>📕 Reading 閱讀 20分</div>
-</div>
+<!-- MAIN CONTENT -->
+<div class="main-content" id="main-content"></div>
 
 <!-- CHINESE RESOURCES PANEL -->
 <div class="ixl-dd-backdrop" id="zh-dd-backdrop" onclick="closeZhDropdown()"></div>
@@ -517,9 +489,9 @@ body { font-family: 'Nunito', system-ui, sans-serif; background: #FFF8EE; min-he
 // ── TASK DEFINITIONS ──
 const T = {
   piano:   { en:"Piano",     zh:"鋼琴",    min:"20分", color:"#6C5CE7", emoji:"🎹" },
-  math:    { en:"Math/IXL",  zh:"數學",    min:"30分", color:"#0984e3", emoji:"🔢" },
+  math:    { en:"IXL",       zh:"IXL 夏日探險", min:"30分", color:"#0984e3", emoji:"📚" },
   coding:  { en:"Coding",    zh:"程式設計", min:"30分", color:"#00a651", emoji:"💻" },
-  chinese: { en:"Chinese",   zh:"中文閱讀", min:"15分", color:"#e17055", emoji:"📖" },
+  chinese: { en:"Chinese",   zh:"中文閱讀", min:"15分", color:"#e67e22", emoji:"📖" },
   violin:  { en:"Violin",    zh:"小提琴",  min:"20分", color:"#d4a017", emoji:"🎻" },
   reading: { en:"Reading",   zh:"課外閱讀", min:"20分", color:"#a29bfe", emoji:"📕" },
 };
@@ -756,13 +728,15 @@ const isDayDone = (wi,di) => {
 };
 const isIxlDone = (id) => !!S[ixlKey(id)];
 const getIxlCount = () => IXL_FLAT.filter(m=>isIxlDone(m.id)).length;
+const getIxlCatDone = () => IXL_ALL.filter(d=>d.skills.every(s=>isIxlDone(s.id))).length;
 const IXL_TOTAL = IXL_FLAT.length;
+const IXL_CATS = IXL_ALL.length;
 const isLocked = (wi) => wi > currentWeekIdx;
 
 // ── CURRENT STATE ──
 let currentWeekIdx = getCurrentWeekIdx();
-let activeView = "today";
 let activeWeek = currentWeekIdx;
+let selectedDay = null; // {wi, di} or null
 
 // ── ANIMATIONS ──
 const PRAISE = [
@@ -868,22 +842,19 @@ function toggleIxlMod(id,evt){
   }
 
   // Update the count line in the dropdown header
-  const cnt = getIxlCount();
-  const perDay = Math.ceil((IXL_TOTAL - cnt) / remainingMathDays());
+  const catDone = getIxlCatDone();
   const subEl = document.getElementById('ixl-dd-sub');
-  if(subEl) subEl.textContent = `${cnt}/${IXL_TOTAL} done · do ~${perDay} today 🎯`;
+  if(subEl) subEl.textContent = `${catDone}/${IXL_CATS} categories done · ~1 per day 🎯`;
 
   render(); // update the X/76 badge on the Math/IXL task row
 }
 
-// ── VIEW SWITCH ──
-function switchView(v){
-  activeView=v;
-  document.getElementById("today-view").classList.toggle("on",v==="today");
-  document.getElementById("week-view").classList.toggle("on",v==="week");
-  document.getElementById("vbtn-today").classList.toggle("on",v==="today");
-  document.getElementById("vbtn-week").classList.toggle("on",v==="week");
-  if(v==="week") renderWeekView();
+// ── DAY SELECTION ──
+function selectDay(wi, di, evt){
+  if(evt) evt.stopPropagation();
+  selectedDay = {wi, di};
+  activeWeek = wi;
+  render();
 }
 
 // ── IXL DROPDOWN ──
@@ -898,9 +869,8 @@ function remainingMathDays(){
 function buildIxlList(){
   const listEl=document.getElementById("ixl-dd-list");
   if(!listEl) return;
-  const cnt=getIxlCount();
-  const perDay=Math.ceil((IXL_TOTAL-cnt)/remainingMathDays());
-  document.getElementById("ixl-dd-sub").textContent=`${cnt}/${IXL_TOTAL} done · do ~${perDay} today 🎯`;
+  const catDone=getIxlCatDone();
+  document.getElementById("ixl-dd-sub").textContent=`${catDone}/${IXL_CATS} categories done · ~1 per day 🎯`;
   listEl.innerHTML="";
   IXL_ALL.forEach(dayObj=>{
     const dayDone=dayObj.skills.filter(m=>isIxlDone(m.id)).length;
@@ -1032,43 +1002,24 @@ function renderWkTabs(){
     const btn=document.createElement("button");
     btn.className="wk-tab"+(wi===activeWeek?" on":"")+(allDone&&!locked?" done":"")+(locked?" locked":"");
     btn.textContent=wk.label+(allDone&&!locked?" ✓":"");
-    btn.onclick=()=>{ activeWeek=wi; switchView('week'); };
+    btn.onclick=()=>{ activeWeek=wi; selectedDay=null; render(); };
     el.appendChild(btn);
   });
 }
 
-// ── RENDER TODAY VIEW ──
-function renderTodayView(){
-  const el=document.getElementById("today-content");
-  const todayInfo=getTodayInfo();
-
-  if(!todayInfo){
-    const d=daysUntilSummer();
-    if(d>0){
-      el.innerHTML=`<div class="pre-summer">
-        <div class="pre-emoji">☀️</div>
-        <div class="pre-title">暑假快到了！</div>
-        <div class="pre-sub">Summer is almost here!</div>
-        <div class="pre-count">${d}</div>
-        <div class="pre-days">days until Jun 15 · 天後開始</div>
-      </div>`;
-    } else {
-      el.innerHTML=`<div class="pre-summer">
-        <div class="pre-emoji">🎉</div>
-        <div class="pre-title">暑假結束囉！</div>
-        <div class="pre-sub">Summer complete! Amazing work, Evelyn! 🌟</div>
-      </div>`;
-    }
-    return;
-  }
-
-  const {wi,di,day}=todayInfo;
+// ── RENDER DAY DETAIL ──
+function renderDayDetail(wi, di){
+  const el=document.getElementById("main-content");
+  const day=WEEKS[wi].days[di];
   const locked=isLocked(wi);
+  const isTodayDay=isToday(day.date);
 
-  let html=`<div class="today-hd">
+  let html=`<button class="day-detail-back" onclick="selectedDay=null;render()">← 本週 ${WEEKS[wi].label}</button>
+  <div class="today-hd">
     <div class="today-dow-row">
       <span class="today-dow">${day.dow}</span>
       <span class="today-dow-zh">${DOW_ZH[day.dow]}</span>
+      ${isTodayDay?'<span class="today-badge">今天 TODAY</span>':''}
     </div>
     <div class="today-date">${day.date}</div>`;
 
@@ -1078,7 +1029,7 @@ function renderTodayView(){
   if(day.camp==="tennis") pills.push(`<span class="pill p-tennis">🎾 網球夏令營</span>`);
   if(day.lesson)          pills.push(`<span class="pill p-lesson">🎹 鋼琴課</span>`);
   if(day.holiday)         pills.push(`<span class="pill p-holiday">🎆 美國國慶日</span>`);
-  if(pills.length) html+=`<div class="pills">${pills.join("")}</div>`;
+  if(pills.length) html+=`<div class="pills">${pills.join("")}</div></div>`;
   else html+=`</div>`;
 
   if(day.free){
@@ -1098,7 +1049,7 @@ function renderTodayView(){
         const checked=isDone(prev.wi,prev.di,t);
         const def=T[t];
         if(t==="math"){
-          const cnt=getIxlCount(), perDay=Math.ceil((IXL_TOTAL-cnt)/remainingMathDays());
+          const catDone=getIxlCatDone();
           html+=`<div class="big-task${checked?" done-task":""}" onclick="openIxlDropdown(event)">
             <div class="big-cb${checked?" on":""}" onclick="event.stopPropagation();toggle(${prev.wi},${prev.di},'math',event)"><span class="big-cb-mark">✓</span></div>
             <div class="big-t-info">
@@ -1107,7 +1058,7 @@ function renderTodayView(){
             </div>
             <div style="text-align:right;flex-shrink:0;display:flex;flex-direction:column;align-items:flex-end;gap:4px">
               <span class="from-yest-badge">← 昨天</span>
-              <div style="font-size:11px;font-weight:800;color:#7AAAE0">${cnt}/${IXL_TOTAL} ▾</div>
+              <div style="font-size:11px;font-weight:800;color:#7AAAE0">${catDone}/${IXL_CATS} ▾</div>
             </div>
           </div>`;
         } else if(t==="chinese"){
@@ -1119,7 +1070,7 @@ function renderTodayView(){
             </div>
             <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0">
               <span class="from-yest-badge">← 昨天</span>
-              <span style="font-size:12px;font-weight:800;color:#E74C3C">▶ 看影片</span>
+              <span style="font-size:12px;font-weight:800;color:#e67e22">▶ 看影片</span>
             </div>
           </div>`;
         } else {
@@ -1143,9 +1094,8 @@ function renderTodayView(){
       const pBtn=canPostpone ? `<button class="postpone-btn" onclick="postponeTask(${wi},${di},'${t}',event)">→ 明天</button>` : '';
       const pBadge=postponed ? `<span class="postponed-badge">→ 明天</span>` : '';
       if(t==="math" && !locked){
-        const cnt=getIxlCount();
-        const perDay=Math.ceil((IXL_TOTAL-cnt)/remainingMathDays());
-        html+=`<div class="big-task${checked?" done-task":""}${postponed?" done-task":""}" onclick="openIxlDropdown(event)">
+        const catDone=getIxlCatDone();
+        html+=`<div class="big-task${checked||postponed?" done-task":""}" onclick="openIxlDropdown(event)">
           <div class="big-cb${checked?" on":""}" onclick="event.stopPropagation();toggle(${wi},${di},'math',event)"><span class="big-cb-mark">✓</span></div>
           <div class="big-t-info">
             <div class="big-t-en${checked||postponed?" done":""}" style="color:${checked||postponed?"#ccc":def.color}">${def.emoji} ${def.zh}</div>
@@ -1153,8 +1103,8 @@ function renderTodayView(){
           </div>
           <div style="text-align:right;flex-shrink:0;display:flex;flex-direction:column;align-items:flex-end;gap:4px">
             ${pBadge}${pBtn}
-            <div style="font-size:13px;font-weight:800;color:#7AAAE0">${cnt}/${IXL_TOTAL} ▾</div>
-            <div style="font-size:11px;font-weight:800;color:#FD79A8">~${perDay} 今天 🎯</div>
+            <div style="font-size:12px;font-weight:800;color:#7AAAE0">${catDone}/${IXL_CATS} ▾</div>
+            <div style="font-size:11px;font-weight:800;color:#FD79A8">~1 category 🎯</div>
           </div>
         </div>`;
       } else if(t==="chinese" && !locked){
@@ -1166,7 +1116,7 @@ function renderTodayView(){
           </div>
           <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0">
             ${pBadge}${pBtn}
-            <span style="font-size:13px;font-weight:800;color:#E74C3C">▶ 看影片</span>
+            <span style="font-size:13px;font-weight:800;color:#e67e22">▶ 看影片</span>
           </div>
         </div>`;
       } else {
@@ -1187,21 +1137,34 @@ function renderTodayView(){
   el.innerHTML=html;
 }
 
-// ── RENDER WEEK VIEW ──
+// ── RENDER WEEK GRID ──
 function renderWeekView(){
+  const el=document.getElementById("main-content");
   const wi=activeWeek;
   const wk=WEEKS[wi];
   const locked=isLocked(wi);
-  document.getElementById("wk-dates-label").textContent=wk.dates+(locked?" · coming soon 🔒":"");
-  const ixlCount=getIxlCount();
-  document.getElementById("wk-ixl-cnt").textContent=`${ixlCount}/${IXL_TOTAL} ✓`;
+  const catDone=getIxlCatDone();
+
+  el.innerHTML=`<div class="wk-header">
+    <span class="wk-dates">${wk.dates}${locked?' · coming soon 🔒':''}</span>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button class="wk-ixl-btn" onclick="openIxlDropdown(event)">
+        <span class="wk-ixl-lbl">📚 IXL</span>
+        <span class="wk-ixl-cnt">${catDone}/${IXL_CATS} ✓</span>
+      </button>
+      <button class="wk-zh-btn" onclick="openZhDropdown(event)">
+        <span class="wk-zh-lbl">📖 中文影片</span>
+      </button>
+    </div>
+  </div>
+  <div class="days" id="days-grid"></div>`;
 
   const grid=document.getElementById("days-grid");
   grid.innerHTML="";
   wk.days.forEach((d,di)=>{
     const dayDone=isDayDone(wi,di);
-    const cls=["day",d.free?"is-free":"",(!d.free&&dayDone)?"complete":"",locked?"is-locked":""].filter(Boolean).join(" ");
-    let html=`<div class="${cls}">
+    const cls=["day",d.free?"is-free":"",(!d.free&&dayDone)?"complete":"",locked?"is-locked":"",isToday(d.date)?"is-today":""].filter(Boolean).join(" ");
+    let html=`<div class="${cls}" onclick="selectDay(${wi},${di},event)" style="cursor:pointer">
       <div class="day-accent acc-${d.dow}"></div>
       <div class="day-body">
         <div class="day-dow-row">
@@ -1252,10 +1215,10 @@ function renderWeekView(){
         if(!locked && t==="math"){
           const cnt=getIxlCount();
           handler=`onclick="openIxlDropdown(event)"`;
-          rightSide=`<span style="font-size:10px;font-weight:800;color:#7AAAE0;flex-shrink:0">${cnt}/${IXL_TOTAL}</span>`;
+          rightSide=`<span style="font-size:10px;font-weight:800;color:#7AAAE0;flex-shrink:0">${getIxlCatDone()}/${IXL_CATS}</span>`;
         } else if(!locked && t==="chinese"){
           handler=`onclick="openZhDropdown(event)"`;
-          rightSide=`<span style="font-size:11px;font-weight:800;color:#E74C3C;flex-shrink:0">▶</span>`;
+          rightSide=`<span style="font-size:11px;font-weight:800;color:#e67e22;flex-shrink:0">▶</span>`;
         } else {
           handler=locked?"":`onclick="toggle(${wi},${di},'${t}',event)"`;
         }
@@ -1281,14 +1244,13 @@ function renderWeekView(){
 function render(){
   renderHeader();
   renderWkTabs();
-  if(activeView==="today") renderTodayView();
+  if(selectedDay) renderDayDetail(selectedDay.wi, selectedDay.di);
   else renderWeekView();
 }
 
 // ── INIT ──
-// Set activeWeek to current week, auto-show today's week tab
 const todayInfo=getTodayInfo();
-if(todayInfo) activeWeek=todayInfo.wi;
+if(todayInfo){ activeWeek=todayInfo.wi; selectedDay={wi:todayInfo.wi, di:todayInfo.di}; }
 render();
 </script>
 </body>
