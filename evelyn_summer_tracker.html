@@ -906,15 +906,23 @@ function buildIxlList(){
   const perDay=Math.ceil((IXL_TOTAL-cnt)/remainingMathDays());
   document.getElementById("ixl-dd-sub").textContent=`${cnt}/${IXL_TOTAL} done · do ~${perDay} today 🎯`;
   listEl.innerHTML="";
-  IXL_FLAT.forEach(m=>{
-    const done=isIxlDone(m.id);
-    listEl.innerHTML+=`
-      <div class="ixl-dd-row${done?" done":""}" onclick="toggleIxlMod('${m.id}',event)">
-        <div class="ixl-dd-cb${done?" on":""}"><span class="ixl-dd-cb-mark">✓</span></div>
-        <div class="ixl-dd-name${done?" done":""}">${m.title}</div>
-        <span class="ixl-code-badge">${m.code}</span>
-        <span class="ixl-subj-badge" style="background:${SUBJ_COLOR[m.subj]}22;color:${SUBJ_COLOR[m.subj]}">${m.subj}</span>
-      </div>`;
+  IXL_ALL.forEach(dayObj=>{
+    const dayDone=dayObj.skills.filter(m=>isIxlDone(m.id)).length;
+    const allDone=dayDone===dayObj.skills.length;
+    listEl.innerHTML+=`<div style="font-size:11px;font-weight:900;color:${allDone?"#bbb":"#888"};text-transform:uppercase;letter-spacing:0.05em;padding:8px 4px 4px;display:flex;align-items:center;gap:6px">
+      <span>${dayObj.theme}</span>
+      <span style="font-size:10px;font-weight:800;color:${allDone?"#00B894":"#bbb"}">${dayDone}/${dayObj.skills.length}</span>
+    </div>`;
+    dayObj.skills.forEach(m=>{
+      const done=isIxlDone(m.id);
+      listEl.innerHTML+=`
+        <div class="ixl-dd-row${done?" done":""}" onclick="toggleIxlMod('${m.id}',event)">
+          <div class="ixl-dd-cb${done?" on":""}"><span class="ixl-dd-cb-mark">✓</span></div>
+          <div class="ixl-dd-name${done?" done":""}">${m.title}</div>
+          <span class="ixl-code-badge">${m.code}</span>
+          <span class="ixl-subj-badge" style="background:${SUBJ_COLOR[m.subj]}22;color:${SUBJ_COLOR[m.subj]}">${m.subj}</span>
+        </div>`;
+    });
   });
 }
 // ── CHINESE PANEL ──
