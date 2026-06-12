@@ -1,0 +1,850 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>愛的暑假 2026</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root { color-scheme: light; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Nunito', system-ui, sans-serif; background: #FFF8EE; min-height: 100vh; }
+
+/* ── HEADER ── */
+.hdr {
+  background: linear-gradient(135deg, #6C5CE7 0%, #00B894 100%);
+  padding: 18px 20px 16px; color: #fff;
+  display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;
+}
+.hdr-left { flex: 1; min-width: 160px; }
+.hdr-title { font-size: 20px; font-weight: 900; text-shadow: 0 1px 4px rgba(0,0,0,0.2); line-height: 1.25; }
+.hdr-sub { font-size: 12px; opacity: 0.8; margin-top: 2px; font-weight: 600; }
+.today-chip {
+  background: rgba(255,255,255,0.22); border-radius: 16px;
+  padding: 9px 16px; text-align: center; white-space: nowrap; flex-shrink: 0;
+}
+.chip-date { font-size: 13px; font-weight: 800; opacity: 0.9; }
+.chip-prog { font-size: 28px; font-weight: 900; line-height: 1.1; margin: 2px 0; }
+.chip-label { font-size: 10px; opacity: 0.8; font-weight: 700; }
+
+/* ── NAV BAR ── */
+.nav-bar {
+  background: #fff; border-bottom: 2px solid #F0EAD6;
+  padding: 10px 20px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+}
+.view-btns { display: flex; gap: 6px; flex-shrink: 0; }
+.vbtn {
+  padding: 7px 16px; border-radius: 20px; font-size: 14px; font-weight: 800;
+  cursor: pointer; border: 2px solid #E8E0CC; background: transparent; color: #aaa;
+  transition: all 0.15s; font-family: 'Nunito', sans-serif;
+}
+.vbtn.on { background: #6C5CE7; color: #fff; border-color: #6C5CE7; }
+.wk-tabs { display: flex; gap: 5px; overflow-x: auto; scrollbar-width: none; flex: 1; }
+.wk-tabs::-webkit-scrollbar { display: none; }
+.wk-tab {
+  flex-shrink: 0; padding: 5px 11px; border-radius: 20px; font-size: 12px; font-weight: 800;
+  cursor: pointer; border: 2px solid #E8E0CC; background: transparent; color: #bbb;
+  transition: all 0.15s; font-family: 'Nunito', sans-serif;
+}
+.wk-tab.on  { background: #6C5CE7; color: #fff; border-color: #6C5CE7; }
+.wk-tab.done:not(.on) { background: #D4F5E9; color: #085041; border-color: #00B894; }
+.wk-tab.locked { opacity: 0.6; }
+
+/* ── TODAY VIEW ── */
+.today-view { padding: 18px 20px 28px; display: none; }
+.today-view.on { display: block; }
+
+.today-hd { margin-bottom: 16px; }
+.today-dow-row { display: flex; align-items: center; gap: 8px; }
+.today-dow { font-size: 15px; font-weight: 800; color: #bbb; text-transform: uppercase; letter-spacing: 0.08em; }
+.today-dow-zh { font-size: 16px; font-weight: 700; color: #ccc; }
+.today-date { font-size: 34px; font-weight: 900; color: #1a1a1a; line-height: 1; margin: 4px 0 10px; }
+
+/* pre-summer splash */
+.pre-summer { text-align: center; padding: 40px 20px; }
+.pre-emoji { font-size: 64px; }
+.pre-title { font-size: 26px; font-weight: 900; color: #333; margin-top: 14px; }
+.pre-sub { font-size: 16px; color: #999; font-weight: 600; margin-top: 6px; }
+.pre-count { font-size: 56px; font-weight: 900; color: #6C5CE7; margin: 12px 0 4px; }
+.pre-days { font-size: 14px; color: #aaa; font-weight: 700; }
+
+/* pills */
+.pills { display: flex; flex-wrap: wrap; gap: 5px; margin: 0 0 14px; }
+.pill { font-size: 12px; padding: 3px 10px; border-radius: 20px; font-weight: 700; }
+.p-swim    { background: #D6EAF8; color: #1A5276; }
+.p-tennis  { background: #D5F5E3; color: #1E8449; }
+.p-lesson  { background: #E8DAEF; color: #6C3483; }
+.p-holiday { background: #FDEBD0; color: #784212; }
+
+/* big task rows */
+.big-tasks { display: flex; flex-direction: column; gap: 10px; }
+.big-task {
+  display: flex; align-items: center; gap: 14px;
+  background: #fff; border-radius: 20px; padding: 16px 18px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.07); cursor: pointer;
+  transition: transform 0.1s, background 0.1s; -webkit-tap-highlight-color: transparent;
+  border: 2px solid transparent;
+}
+.big-task:hover { background: #FAFAFA; }
+.big-task:active { transform: scale(0.98); }
+.big-task.done-task { border-color: rgba(0,184,148,0.2); }
+
+.big-cb {
+  width: 42px; height: 42px; border-radius: 13px; flex-shrink: 0;
+  border: 3px solid #ddd; display: flex; align-items: center; justify-content: center;
+  transition: all 0.22s cubic-bezier(0.34,1.56,0.64,1); background: #fff;
+}
+.big-cb.on { border-color: #00B894; background: #00B894; transform: scale(1.1); }
+.big-cb-mark { display: none; color: #fff; font-size: 22px; font-weight: 900; }
+.big-cb.on .big-cb-mark { display: block; }
+
+.big-t-info { flex: 1; }
+.big-t-en { font-size: 20px; font-weight: 800; transition: color 0.2s; }
+.big-t-en.done { color: #ccc !important; text-decoration: line-through; }
+.big-t-zh { font-size: 14px; font-weight: 600; color: #aaa; margin-top: 2px; }
+.big-t-zh.done { color: #ddd; text-decoration: line-through; }
+.big-t-min { font-size: 13px; color: #ccc; font-weight: 600; }
+
+/* free day today */
+.free-today { text-align: center; padding: 48px 20px 36px; }
+.free-today-icon { font-size: 72px; }
+.free-today-zh { font-size: 26px; font-weight: 900; color: #c8b9a0; margin-top: 12px; }
+.free-today-en { font-size: 18px; font-weight: 700; color: #d5c9b5; margin-top: 4px; }
+
+/* IXL section (today view) */
+.ixl-section { margin-top: 18px; }
+.ixl-toggle-btn {
+  width: 100%; display: flex; align-items: center; justify-content: space-between;
+  background: #EEF4FF; border: 2px solid #D0E4FF; border-radius: 18px;
+  padding: 14px 18px; cursor: pointer; transition: background 0.15s;
+  font-family: 'Nunito', sans-serif; text-align: left;
+}
+.ixl-toggle-btn:hover { background: #E5EDFF; }
+.ixl-btn-left { display: flex; align-items: center; gap: 10px; }
+.ixl-btn-icon { font-size: 24px; }
+.ixl-btn-title { font-size: 18px; font-weight: 800; color: #2860B0; }
+.ixl-btn-zh { font-size: 13px; font-weight: 600; color: #6B96D4; margin-top: 1px; }
+.ixl-btn-count { font-size: 16px; font-weight: 800; color: #2860B0; margin-right: 6px; }
+.ixl-chevron { font-size: 16px; color: #7AAAE0; transition: transform 0.25s; }
+.ixl-chevron.open { transform: rotate(180deg); }
+
+.ixl-mods-list { display: none; flex-direction: column; gap: 9px; padding: 10px 0 4px; }
+.ixl-mods-list.open { display: flex; }
+
+.ixl-mod-row {
+  display: flex; align-items: center; gap: 14px;
+  background: #fff; border-radius: 16px; padding: 14px 18px;
+  box-shadow: 0 1px 6px rgba(0,0,0,0.06); cursor: pointer;
+  border: 2px solid #E8F0FF; transition: background 0.1s;
+  -webkit-tap-highlight-color: transparent;
+}
+.ixl-mod-row:hover { background: #F8FAFF; }
+.ixl-mod-cb {
+  width: 36px; height: 36px; border-radius: 11px; flex-shrink: 0;
+  border: 2.5px solid #378ADD; display: flex; align-items: center; justify-content: center;
+  transition: all 0.22s cubic-bezier(0.34,1.56,0.64,1); background: #fff;
+}
+.ixl-mod-cb.on { background: #378ADD; border-color: #378ADD; transform: scale(1.1); }
+.ixl-mod-cb-mark { display: none; color: #fff; font-size: 18px; font-weight: 900; }
+.ixl-mod-cb.on .ixl-mod-cb-mark { display: block; }
+.ixl-mod-emoji { font-size: 24px; flex-shrink: 0; }
+.ixl-mod-info { flex: 1; }
+.ixl-mod-title { font-size: 17px; font-weight: 800; color: #2860B0; }
+.ixl-mod-title.done { color: #aaa; text-decoration: line-through; }
+.ixl-mod-zh { font-size: 13px; font-weight: 600; color: #7AAAE0; margin-top: 1px; }
+.ixl-mod-desc { font-size: 12px; color: #bbb; font-weight: 600; margin-top: 3px; }
+
+/* ── WEEK VIEW ── */
+.week-view { padding: 16px 20px 28px; display: none; }
+.week-view.on { display: block; }
+
+.wk-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; flex-wrap: wrap; gap: 8px; }
+.wk-dates { font-size: 17px; font-weight: 800; color: #333; }
+.wk-ixl-btn {
+  display: flex; align-items: center; gap: 7px;
+  background: #EEF4FF; border: 2px solid #D0E4FF; border-radius: 20px;
+  padding: 7px 14px; cursor: pointer; font-family: 'Nunito', sans-serif;
+  transition: background 0.15s;
+}
+.wk-ixl-btn:hover { background: #E5EDFF; }
+.wk-ixl-lbl { font-size: 13px; color: #2860B0; font-weight: 800; }
+.wk-ixl-cnt { font-size: 13px; color: #5A85C8; font-weight: 800; }
+
+/* 7-column day grid */
+.days { display: grid; grid-template-columns: repeat(7, 1fr); gap: 9px; }
+@media (max-width: 1100px) { .days { grid-template-columns: repeat(4, 1fr); } }
+@media (max-width: 700px)  { .days { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 380px)  { .days { grid-template-columns: 1fr; } }
+
+.day { background: #fff; border-radius: 16px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.07); border: 2.5px solid transparent; transition: all 0.3s; }
+.day.complete { border-color: #00B894; box-shadow: 0 2px 8px rgba(0,184,148,0.2); }
+.day.is-free { background: #FFFBF0; border: 2.5px dashed #F0EAD6; box-shadow: none; }
+.day.is-locked { /* fully visible, tasks just non-interactive */ }
+
+.day-accent { height: 6px; }
+.acc-Mon { background: linear-gradient(90deg,#6C5CE7,#a29bfe); }
+.acc-Tue { background: linear-gradient(90deg,#0984e3,#74b9ff); }
+.acc-Wed { background: linear-gradient(90deg,#00B894,#55efc4); }
+.acc-Thu { background: linear-gradient(90deg,#e17055,#fab1a0); }
+.acc-Fri { background: linear-gradient(90deg,#00a651,#55efc4); }
+.acc-Sat { background: linear-gradient(90deg,#fdcb6e,#ffeaa7); }
+.acc-Sun { background: #F0EAD6; }
+
+.day-body { padding: 10px 11px 12px; }
+.day-dow-row { display: flex; align-items: baseline; gap: 4px; }
+.day-dow { font-size: 10px; font-weight: 800; color: #bbb; text-transform: uppercase; letter-spacing: 0.06em; }
+.day-dow-zh { font-size: 11px; font-weight: 700; color: #ccc; }
+.day-date { font-size: 15px; font-weight: 900; color: #1a1a1a; margin: 3px 0 8px; }
+
+.day-free-body { text-align: center; padding: 14px 0 10px; }
+.day-free-icon { font-size: 32px; }
+.day-free-zh { font-size: 13px; font-weight: 800; color: #c8b9a0; margin-top: 4px; }
+.day-free-en { font-size: 11px; font-weight: 700; color: #d5c9b5; }
+
+.tasks { display: flex; flex-direction: column; gap: 5px; }
+.task {
+  display: flex; align-items: center; gap: 7px;
+  padding: 5px 4px; border-radius: 10px;
+  cursor: pointer; transition: background 0.1s; -webkit-tap-highlight-color: transparent;
+}
+.task:hover { background: #f7f3ea; }
+.task.locked-task { cursor: not-allowed; pointer-events: none; }
+
+.cb { width: 25px; height: 25px; border-radius: 7px; flex-shrink: 0; border: 2.5px solid #ddd; display: flex; align-items: center; justify-content: center; transition: all 0.2s cubic-bezier(0.34,1.56,0.64,1); background: #fff; }
+.cb.on { border-color: #00B894; background: #00B894; transform: scale(1.15); }
+.cb-mark { display: none; color: #fff; font-size: 14px; font-weight: 900; }
+.cb.on .cb-mark { display: block; }
+
+.t-info { flex: 1; min-width: 0; }
+.t-en { font-size: 13px; font-weight: 800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; transition: color 0.2s; }
+.t-en.done { color: #ccc !important; text-decoration: line-through; }
+.t-zh { font-size: 11px; font-weight: 600; color: #bbb; margin-top: 1px; }
+.t-zh.done { color: #ddd; text-decoration: line-through; }
+.t-min { font-size: 10px; color: #ccc; font-weight: 600; }
+
+/* ── IXL BOTTOM SHEET OVERLAY ── */
+.ixl-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.35); z-index: 9000;
+  display: none; align-items: flex-end; justify-content: center;
+}
+.ixl-overlay.open { display: flex; }
+.ixl-sheet {
+  background: #fff; border-radius: 28px 28px 0 0;
+  width: 100%; max-width: 640px; padding: 8px 24px 36px;
+  box-shadow: 0 -8px 40px rgba(0,0,0,0.15);
+  transform: translateY(100%); transition: transform 0.35s cubic-bezier(0.34,1.2,0.64,1);
+}
+.ixl-overlay.open .ixl-sheet { transform: translateY(0); }
+.ixl-sheet-handle { width: 38px; height: 5px; background: #DDD; border-radius: 3px; margin: 12px auto 20px; }
+.ixl-sheet-title { font-size: 22px; font-weight: 900; color: #2860B0; margin-bottom: 3px; }
+.ixl-sheet-sub { font-size: 14px; color: #999; font-weight: 600; margin-bottom: 18px; }
+.ixl-sheet-mods { display: flex; flex-direction: column; gap: 10px; }
+.ixl-sheet-close {
+  margin-top: 20px; width: 100%; padding: 14px;
+  background: #F0EAD6; border: none; border-radius: 14px;
+  font-size: 15px; font-weight: 800; color: #888;
+  cursor: pointer; font-family: 'Nunito', sans-serif; transition: background 0.15s;
+}
+.ixl-sheet-close:hover { background: #E5D9C0; }
+
+/* ── LEGEND ── */
+.legend { display: flex; flex-wrap: wrap; gap: 8px 16px; padding: 14px 20px 18px; border-top: 2px solid #F0EAD6; background: #fff; }
+.leg { display: flex; align-items: center; gap: 5px; font-size: 13px; color: #aaa; font-weight: 700; }
+.leg-dot { width: 10px; height: 10px; border-radius: 3px; flex-shrink: 0; }
+
+/* ── CONFETTI ── */
+.confetti-piece { position: fixed; pointer-events: none; z-index: 9999; border-radius: 2px; }
+.mini-praise {
+  position: fixed; pointer-events: none; z-index: 9998;
+  font-family: 'Nunito', sans-serif; font-weight: 900; font-size: 18px;
+  white-space: nowrap; animation: floatUp 0.9s ease forwards;
+}
+@keyframes floatUp {
+  0%   { opacity: 1; transform: translateY(0) scale(1); }
+  50%  { opacity: 1; transform: translateY(-36px) scale(1.15); }
+  100% { opacity: 0; transform: translateY(-68px) scale(0.9); }
+}
+.day-toast {
+  position: fixed; top: 50%; left: 50%;
+  transform: translate(-50%,-50%) scale(0.6);
+  background: #fff; border-radius: 28px;
+  padding: 28px 36px; text-align: center;
+  box-shadow: 0 24px 70px rgba(0,0,0,0.22);
+  z-index: 10000; pointer-events: none;
+  opacity: 0; transition: all 0.35s cubic-bezier(0.34,1.56,0.64,1);
+  min-width: 230px;
+}
+.day-toast.show { opacity: 1; transform: translate(-50%,-50%) scale(1); }
+.toast-emoji { font-size: 52px; margin-bottom: 10px; }
+.toast-en { font-size: 22px; font-weight: 900; color: #1a1a1a; }
+.toast-zh { font-size: 20px; font-weight: 800; color: #6C5CE7; margin-top: 6px; }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="hdr">
+  <div class="hdr-left">
+    <div class="hdr-title">⭐ 愛的暑假 2026 ⭐<br>Evelyn's Summer 2026</div>
+    <div class="hdr-sub">6月15日 – 7月29日 · Jun 15 – Jul 29</div>
+  </div>
+  <div class="today-chip">
+    <div class="chip-date" id="chip-date">—</div>
+    <div class="chip-prog" id="chip-prog">—</div>
+    <div class="chip-label">今天完成 done</div>
+  </div>
+</div>
+
+<!-- NAV BAR -->
+<div class="nav-bar">
+  <div class="view-btns">
+    <button class="vbtn on" id="vbtn-today" onclick="switchView('today')">📅 今天</button>
+    <button class="vbtn" id="vbtn-week" onclick="switchView('week')">📆 本週</button>
+  </div>
+  <div class="wk-tabs" id="wk-tabs"></div>
+</div>
+
+<!-- TODAY VIEW -->
+<div class="today-view on" id="today-view">
+  <div id="today-content"></div>
+</div>
+
+<!-- WEEK VIEW -->
+<div class="week-view" id="week-view">
+  <div class="wk-header">
+    <span class="wk-dates" id="wk-dates-label">—</span>
+    <button class="wk-ixl-btn" id="wk-ixl-btn" onclick="openIxlSheet()">
+      <span class="wk-ixl-lbl">📚 IXL</span>
+      <span class="wk-ixl-cnt" id="wk-ixl-cnt">0/2</span>
+    </button>
+  </div>
+  <div class="days" id="days-grid"></div>
+</div>
+
+<!-- LEGEND -->
+<div class="legend">
+  <div class="leg"><div class="leg-dot" style="background:#6C5CE7"></div>🎹 Piano 鋼琴 20分</div>
+  <div class="leg"><div class="leg-dot" style="background:#0984e3"></div>🔢 Math 數學 30分</div>
+  <div class="leg"><div class="leg-dot" style="background:#00a651"></div>💻 Coding 程式 30分</div>
+  <div class="leg"><div class="leg-dot" style="background:#e17055"></div>📖 Chinese 中文 15分</div>
+  <div class="leg"><div class="leg-dot" style="background:#d4a017"></div>🎻 Violin 小提琴 20分</div>
+  <div class="leg"><div class="leg-dot" style="background:#a29bfe"></div>📕 Reading 閱讀 20分</div>
+</div>
+
+<!-- IXL BOTTOM SHEET -->
+<div class="ixl-overlay" id="ixl-overlay" onclick="maybeCloseSheet(event)">
+  <div class="ixl-sheet" id="ixl-sheet">
+    <div class="ixl-sheet-handle"></div>
+    <div class="ixl-sheet-title" id="ixl-sheet-title">📚 IXL 本週任務</div>
+    <div class="ixl-sheet-sub" id="ixl-sheet-sub">This week's IXL adventures</div>
+    <div class="ixl-sheet-mods" id="ixl-sheet-mods"></div>
+    <button class="ixl-sheet-close" onclick="closeIxlSheet()">關閉 Close ✕</button>
+  </div>
+</div>
+
+<script>
+// ── TASK DEFINITIONS ──
+const T = {
+  piano:   { en:"Piano",     zh:"鋼琴",    min:"20分", color:"#6C5CE7", emoji:"🎹" },
+  math:    { en:"Math/IXL",  zh:"數學",    min:"30分", color:"#0984e3", emoji:"🔢" },
+  coding:  { en:"Coding",    zh:"程式設計", min:"30分", color:"#00a651", emoji:"💻" },
+  chinese: { en:"Chinese",   zh:"中文閱讀", min:"15分", color:"#e17055", emoji:"📖" },
+  violin:  { en:"Violin",    zh:"小提琴",  min:"20分", color:"#d4a017", emoji:"🎻" },
+  reading: { en:"Reading",   zh:"課外閱讀", min:"20分", color:"#a29bfe", emoji:"📕" },
+};
+const DOW_ZH = {Mon:"週一",Tue:"週二",Wed:"週三",Thu:"週四",Fri:"週五",Sat:"週六",Sun:"週日"};
+
+// ── IXL MODULES (2 per week, Money first per priority) ──
+const IXL_WEEKS = [
+  [ // Week 1 (Jun 15–21)
+    { id:"w0a", title:"Money",       zh:"金錢計算", desc:"Coins & bills — priority! ⭐", emoji:"💰" },
+    { id:"w0b", title:"Making Tens", zh:"湊十法",   desc:"Addition strategies",          emoji:"🔟" },
+  ],
+  [ // Week 2 (Jun 22–28)
+    { id:"w1a", title:"Place Value",   zh:"位值",   desc:"Tens & ones",            emoji:"📊" },
+    { id:"w1b", title:"Skip Counting", zh:"跳著數", desc:"By 2s, 5s, and 10s",    emoji:"🦘" },
+  ],
+  [ // Week 3 (Jun 29–Jul 5)
+    { id:"w2a", title:"Fact Families",     zh:"數字家族", desc:"Add & subtract relationships", emoji:"👨‍👩‍👧" },
+    { id:"w2b", title:"Comparing Numbers", zh:"比大小",   desc:"Greater, less, equal",         emoji:"⚖️" },
+  ],
+  [ // Week 4 (Jul 6–12)
+    { id:"w3a", title:"Time",        zh:"時鐘",  desc:"Hours & half hours", emoji:"⏰" },
+    { id:"w3b", title:"Measurement", zh:"測量",  desc:"Length & height",    emoji:"📏" },
+  ],
+  [ // Week 5 (Jul 13–19)
+    { id:"w4a", title:"Shapes",    zh:"形狀", desc:"2D and 3D shapes",          emoji:"🔷" },
+    { id:"w4b", title:"Fractions", zh:"分數", desc:"Halves, thirds, fourths",   emoji:"🍕" },
+  ],
+  [ // Week 6 (Jul 20–26)
+    { id:"w5a", title:"Word Problems +", zh:"加法應用題", desc:"Addition word problems",    emoji:"➕" },
+    { id:"w5b", title:"Word Problems −", zh:"減法應用題", desc:"Subtraction word problems", emoji:"➖" },
+  ],
+  [ // Week 7 (Jul 27–29)
+    { id:"w6a", title:"Even & Odd",   zh:"奇數偶數", desc:"Even and odd numbers",      emoji:"🎲" },
+    { id:"w6b", title:"Graphs & Data", zh:"圖表資料", desc:"Bar graphs & tally charts", emoji:"📈" },
+  ],
+];
+
+// ── WEEKS (violin now Thu + Sat = 2x/week) ──
+const WEEKS = [
+  { label:"第1週", dates:"Jun 15–21", days:[
+    {dow:"Mon",date:"Jun 15",camp:"swim",tasks:["piano","math","chinese","reading"]},
+    {dow:"Tue",date:"Jun 16",camp:"swim",lesson:true,tasks:["coding","chinese","reading"]},
+    {dow:"Wed",date:"Jun 17",camp:"swim",tasks:["piano","math","chinese","reading"]},
+    {dow:"Thu",date:"Jun 18",camp:"swim",tasks:["coding","chinese","violin","reading"]},
+    {dow:"Fri",date:"Jun 19",camp:"swim",tasks:["piano","math","chinese","reading"]},
+    {dow:"Sat",date:"Jun 20",tasks:["violin","math","chinese","reading"]},
+    {dow:"Sun",date:"Jun 21",tasks:["reading"]},
+  ]},
+  { label:"第2週", dates:"Jun 22–28", days:[
+    {dow:"Mon",date:"Jun 22",tasks:["piano","math","chinese","reading"]},
+    {dow:"Tue",date:"Jun 23",lesson:true,tasks:["coding","chinese","reading"]},
+    {dow:"Wed",date:"Jun 24",tasks:["piano","math","chinese","reading"]},
+    {dow:"Thu",date:"Jun 25",tasks:["coding","chinese","violin","reading"]},
+    {dow:"Fri",date:"Jun 26",tasks:["piano","math","chinese","reading"]},
+    {dow:"Sat",date:"Jun 27",tasks:["violin","math","chinese","reading"]},
+    {dow:"Sun",date:"Jun 28",tasks:["reading"]},
+  ]},
+  { label:"第3週", dates:"Jun 29–Jul 5", days:[
+    {dow:"Mon",date:"Jun 29",tasks:["piano","math","chinese","reading"]},
+    {dow:"Tue",date:"Jun 30",lesson:true,tasks:["coding","chinese","reading"]},
+    {dow:"Wed",date:"Jul 1",tasks:["piano","math","chinese","reading"]},
+    {dow:"Thu",date:"Jul 2",tasks:["coding","chinese","violin","reading"]},
+    {dow:"Fri",date:"Jul 3",tasks:["piano","math","chinese","reading"]},
+    {dow:"Sat",date:"Jul 4",holiday:true,tasks:["violin","math","chinese","reading"]},
+    {dow:"Sun",date:"Jul 5",tasks:["reading"]},
+  ]},
+  { label:"第4週", dates:"Jul 6–12", days:[
+    {dow:"Mon",date:"Jul 6",tasks:["piano","math","chinese","reading"]},
+    {dow:"Tue",date:"Jul 7",lesson:true,tasks:["coding","chinese","reading"]},
+    {dow:"Wed",date:"Jul 8",tasks:["piano","math","chinese","reading"]},
+    {dow:"Thu",date:"Jul 9",tasks:["coding","chinese","violin","reading"]},
+    {dow:"Fri",date:"Jul 10",tasks:["piano","math","chinese","reading"]},
+    {dow:"Sat",date:"Jul 11",tasks:["violin","math","chinese","reading"]},
+    {dow:"Sun",date:"Jul 12",tasks:["reading"]},
+  ]},
+  { label:"第5週", dates:"Jul 13–19", days:[
+    {dow:"Mon",date:"Jul 13",tasks:["piano","math","chinese","reading"]},
+    {dow:"Tue",date:"Jul 14",lesson:true,tasks:["coding","chinese","reading"]},
+    {dow:"Wed",date:"Jul 15",tasks:["piano","math","chinese","reading"]},
+    {dow:"Thu",date:"Jul 16",tasks:["coding","chinese","violin","reading"]},
+    {dow:"Fri",date:"Jul 17",tasks:["piano","math","chinese","reading"]},
+    {dow:"Sat",date:"Jul 18",tasks:["violin","math","chinese","reading"]},
+    {dow:"Sun",date:"Jul 19",tasks:["reading"]},
+  ]},
+  { label:"第6週", dates:"Jul 20–26", days:[
+    {dow:"Mon",date:"Jul 20",camp:"tennis",tasks:["piano","math","chinese","reading"]},
+    {dow:"Tue",date:"Jul 21",camp:"tennis",lesson:true,tasks:["coding","chinese","reading"]},
+    {dow:"Wed",date:"Jul 22",camp:"tennis",tasks:["piano","math","chinese","reading"]},
+    {dow:"Thu",date:"Jul 23",camp:"tennis",tasks:["coding","chinese","violin","reading"]},
+    {dow:"Fri",date:"Jul 24",camp:"tennis",tasks:["piano","math","chinese","reading"]},
+    {dow:"Sat",date:"Jul 25",tasks:["violin","math","chinese","reading"]},
+    {dow:"Sun",date:"Jul 26",tasks:["reading"]},
+  ]},
+  { label:"第7週", dates:"Jul 27–29", days:[
+    {dow:"Mon",date:"Jul 27",tasks:["piano","math","chinese","reading"]},
+    {dow:"Tue",date:"Jul 28",lesson:true,tasks:["coding","chinese","reading"]},
+    {dow:"Wed",date:"Jul 29",tasks:["piano","math","chinese","reading"]},
+  ]},
+];
+
+// ── STATE ──
+const SK = "evelyn_s26_v4";
+let S = JSON.parse(localStorage.getItem(SK)||"{}");
+const save = () => localStorage.setItem(SK, JSON.stringify(S));
+
+// ── DATE HELPERS ──
+const MONTHS = {Jan:0,Feb:1,Mar:2,Apr:3,May:4,Jun:5,Jul:6,Aug:7,Sep:8,Oct:9,Nov:10,Dec:11};
+function parseDate(str) {
+  const [m,d] = str.split(" ");
+  return new Date(2026, MONTHS[m], parseInt(d));
+}
+function isToday(dateStr) {
+  const d = parseDate(dateStr), n = new Date();
+  return d.getFullYear()===n.getFullYear() && d.getMonth()===n.getMonth() && d.getDate()===n.getDate();
+}
+function getCurrentWeekIdx() {
+  const now = new Date();
+  const ranges = [
+    ["Jun 15","Jun 21"],["Jun 22","Jun 28"],["Jun 29","Jul 5"],
+    ["Jul 6","Jul 12"],["Jul 13","Jul 19"],["Jul 20","Jul 26"],["Jul 27","Jul 29"]
+  ];
+  for(let i=0;i<ranges.length;i++){
+    if(now>=parseDate(ranges[i][0]) && now<=parseDate(ranges[i][1])) return i;
+  }
+  if(now < parseDate("Jun 15")) return 0; // pre-summer → show week 1
+  return WEEKS.length-1;
+}
+function getTodayInfo() {
+  for(let wi=0;wi<WEEKS.length;wi++)
+    for(let di=0;di<WEEKS[wi].days.length;di++)
+      if(isToday(WEEKS[wi].days[di].date)) return {wi,di,day:WEEKS[wi].days[di]};
+  return null;
+}
+function daysUntilSummer() {
+  const s=new Date(2026,5,15),n=new Date();
+  n.setHours(0,0,0,0); s.setHours(0,0,0,0);
+  return Math.round((s-n)/86400000);
+}
+
+// ── KEYS ──
+const tk     = (wi,di,t) => `${wi}_${di}_${t}`;
+const ixlKey = (id) => `ixl_${id}`;
+const isDone = (wi,di,t) => !!S[tk(wi,di,t)];
+const isDayDone = (wi,di) => {
+  const d=WEEKS[wi].days[di];
+  return d.free || (d.tasks||[]).every(t=>isDone(wi,di,t));
+};
+const isIxlDone = (id) => !!S[ixlKey(id)];
+const getIxlCount = (wi) => IXL_WEEKS[wi].filter(m=>isIxlDone(m.id)).length;
+const isLocked = (wi) => wi > currentWeekIdx;
+
+// ── CURRENT STATE ──
+let currentWeekIdx = getCurrentWeekIdx();
+let activeView = "today";
+let activeWeek = currentWeekIdx;
+
+// ── ANIMATIONS ──
+const PRAISE = [
+  {t:"太棒了！✨",c:"#6C5CE7"},{t:"好厲害！⭐",c:"#00B894"},
+  {t:"棒極了！🌟",c:"#e17055"},{t:"加油！💪",c:"#0984e3"},
+  {t:"Great! 🎊",c:"#6C5CE7"},{t:"Awesome! ⭐",c:"#00B894"},
+  {t:"You rock! 🌈",c:"#e17055"},{t:"So good! ✨",c:"#0984e3"},
+];
+const DAY_MSG = [
+  {e:"🎉",zh:"今天全部完成！",en:"All done today!"},
+  {e:"🌟",zh:"你真的超棒！",en:"You're a superstar!"},
+  {e:"🏆",zh:"全部做完了！好厲害！",en:"Everything done! Wow!"},
+  {e:"💪",zh:"做得太好了！",en:"Fantastic job!"},
+  {e:"🎊",zh:"全部打勾了！",en:"All checked off!"},
+  {e:"🦄",zh:"你是最棒的！",en:"You're the best!"},
+];
+
+function spawnConfetti(x,y,n=16){
+  const cols=["#6C5CE7","#00B894","#e17055","#0984e3","#fdcb6e","#fd79a8","#FFD700","#55efc4"];
+  for(let i=0;i<n;i++){
+    const el=document.createElement("div");
+    el.className="confetti-piece";
+    const sz=6+Math.random()*8;
+    el.style.cssText=`left:${x}px;top:${y}px;width:${sz}px;height:${sz}px;background:${cols[i%cols.length]};border-radius:${Math.random()>.5?"50%":"3px"};`;
+    document.body.appendChild(el);
+    const dx=(Math.random()-.5)*140,dy=-(60+Math.random()*100),rot=Math.random()*450;
+    el.animate(
+      [{transform:"translate(0,0) rotate(0deg)",opacity:1},
+       {transform:`translate(${dx}px,${dy}px) rotate(${rot}deg)`,opacity:0}],
+      {duration:650+Math.random()*450,easing:"cubic-bezier(0,.9,.57,1)",fill:"forwards"}
+    ).onfinish=()=>el.remove();
+  }
+}
+function showMiniPraise(x,y){
+  const p=PRAISE[Math.floor(Math.random()*PRAISE.length)];
+  const el=document.createElement("div");
+  el.className="mini-praise";
+  el.style.cssText=`left:${x-25}px;top:${y-15}px;color:${p.c};`;
+  el.textContent=p.t;
+  document.body.appendChild(el);
+  setTimeout(()=>el.remove(),950);
+}
+function showDayToast(){
+  const p=DAY_MSG[Math.floor(Math.random()*DAY_MSG.length)];
+  const el=document.createElement("div");
+  el.className="day-toast";
+  el.innerHTML=`<div class="toast-emoji">${p.e}</div><div class="toast-en">${p.en}</div><div class="toast-zh">${p.zh}</div>`;
+  document.body.appendChild(el);
+  spawnConfetti(window.innerWidth/2,window.innerHeight*.4,35);
+  setTimeout(()=>el.classList.add("show"),40);
+  setTimeout(()=>{el.classList.remove("show");setTimeout(()=>el.remove(),400);},2600);
+}
+
+// ── ACTIONS ──
+function toggle(wi,di,t,evt){
+  if(isLocked(wi)) return;
+  const checking=!isDone(wi,di,t);
+  if(checking){
+    const r=evt.currentTarget.getBoundingClientRect();
+    const cx=r.left+r.width/2, cy=r.top+r.height/2;
+    spawnConfetti(cx,cy);
+    showMiniPraise(cx,cy);
+    const willFinish=(WEEKS[wi].days[di].tasks||[]).filter(x=>x!==t).every(x=>isDone(wi,di,x));
+    if(willFinish) setTimeout(showDayToast,380);
+  }
+  S[tk(wi,di,t)]=checking;
+  save(); render();
+}
+
+function toggleIxlMod(id,evt){
+  if(evt){const r=evt.currentTarget.getBoundingClientRect();spawnConfetti(r.left+r.width/2,r.top+r.height/2,10);}
+  S[ixlKey(id)]=!isIxlDone(id);
+  save(); render();
+}
+
+// ── VIEW SWITCH ──
+function switchView(v){
+  activeView=v;
+  document.getElementById("today-view").classList.toggle("on",v==="today");
+  document.getElementById("week-view").classList.toggle("on",v==="week");
+  document.getElementById("vbtn-today").classList.toggle("on",v==="today");
+  document.getElementById("vbtn-week").classList.toggle("on",v==="week");
+  if(v==="week") renderWeekView();
+}
+
+// ── IXL SHEET ──
+function openIxlSheet(){
+  const wi=activeWeek;
+  const sheet=document.getElementById("ixl-overlay");
+  document.getElementById("ixl-sheet-title").textContent=`📚 IXL ${WEEKS[wi].label} 任務`;
+  document.getElementById("ixl-sheet-sub").textContent=`${WEEKS[wi].dates} · IXL adventures`;
+  const modsEl=document.getElementById("ixl-sheet-mods");
+  modsEl.innerHTML="";
+  IXL_WEEKS[wi].forEach(m=>{
+    const done=isIxlDone(m.id);
+    modsEl.innerHTML+=`
+      <div class="ixl-mod-row${done?" done-mod":""}" onclick="toggleIxlMod('${m.id}',event)">
+        <div class="ixl-mod-cb${done?" on":""}"><span class="ixl-mod-cb-mark">✓</span></div>
+        <div class="ixl-mod-emoji">${m.emoji}</div>
+        <div class="ixl-mod-info">
+          <div class="ixl-mod-title${done?" done":""}">${m.title}</div>
+          <div class="ixl-mod-zh">${m.zh}</div>
+          <div class="ixl-mod-desc">${m.desc}</div>
+        </div>
+      </div>`;
+  });
+  sheet.classList.add("open");
+}
+function closeIxlSheet(){
+  document.getElementById("ixl-overlay").classList.remove("open");
+  render();
+}
+function maybeCloseSheet(e){
+  if(e.target===document.getElementById("ixl-overlay")) closeIxlSheet();
+}
+
+// ── IXL inline toggle (today view) ──
+let ixlInlineOpen = false;
+function toggleIxlInline(){
+  ixlInlineOpen=!ixlInlineOpen;
+  document.getElementById("ixl-inline-mods")?.classList.toggle("open",ixlInlineOpen);
+  document.getElementById("ixl-chevron")?.classList.toggle("open",ixlInlineOpen);
+}
+
+// ── RENDER HEADER ──
+function renderHeader(){
+  const todayInfo=getTodayInfo();
+  const chipDate=document.getElementById("chip-date");
+  const chipProg=document.getElementById("chip-prog");
+  if(todayInfo){
+    const {wi,di,day}=todayInfo;
+    chipDate.textContent=day.date;
+    if(day.free){
+      chipProg.textContent="🌈";
+    } else {
+      const tasks=day.tasks||[];
+      const done=tasks.filter(t=>isDone(wi,di,t)).length;
+      chipProg.textContent=`${done}/${tasks.length}`;
+    }
+  } else {
+    const d=daysUntilSummer();
+    if(d>0){
+      chipDate.textContent="Jun 15 starts!";
+      chipProg.textContent=`${d}d`;
+    } else {
+      chipDate.textContent="Summer done! 🎉";
+      chipProg.textContent="✓";
+    }
+  }
+}
+
+// ── RENDER WEEK TABS ──
+function renderWkTabs(){
+  const el=document.getElementById("wk-tabs");
+  el.innerHTML="";
+  WEEKS.forEach((wk,wi)=>{
+    const allDone=wk.days.every((_,di)=>isDayDone(wi,di));
+    const locked=isLocked(wi);
+    const btn=document.createElement("button");
+    btn.className="wk-tab"+(wi===activeWeek?" on":"")+(allDone&&!locked?" done":"")+(locked?" locked":"");
+    btn.textContent=wk.label+(allDone&&!locked?" ✓":"");
+    btn.onclick=()=>{ activeWeek=wi; if(activeView==="week") renderWeekView(); renderWkTabs(); };
+    el.appendChild(btn);
+  });
+}
+
+// ── RENDER TODAY VIEW ──
+function renderTodayView(){
+  const el=document.getElementById("today-content");
+  const todayInfo=getTodayInfo();
+
+  if(!todayInfo){
+    const d=daysUntilSummer();
+    if(d>0){
+      el.innerHTML=`<div class="pre-summer">
+        <div class="pre-emoji">☀️</div>
+        <div class="pre-title">暑假快到了！</div>
+        <div class="pre-sub">Summer is almost here!</div>
+        <div class="pre-count">${d}</div>
+        <div class="pre-days">days until Jun 15 · 天後開始</div>
+      </div>`;
+    } else {
+      el.innerHTML=`<div class="pre-summer">
+        <div class="pre-emoji">🎉</div>
+        <div class="pre-title">暑假結束囉！</div>
+        <div class="pre-sub">Summer complete! Amazing work, Evelyn! 🌟</div>
+      </div>`;
+    }
+    return;
+  }
+
+  const {wi,di,day}=todayInfo;
+  const locked=isLocked(wi);
+
+  let html=`<div class="today-hd">
+    <div class="today-dow-row">
+      <span class="today-dow">${day.dow}</span>
+      <span class="today-dow-zh">${DOW_ZH[day.dow]}</span>
+    </div>
+    <div class="today-date">${day.date}</div>`;
+
+  // pills
+  const pills=[];
+  if(day.camp==="swim")   pills.push(`<span class="pill p-swim">🏊 游泳夏令營</span>`);
+  if(day.camp==="tennis") pills.push(`<span class="pill p-tennis">🎾 網球夏令營</span>`);
+  if(day.lesson)          pills.push(`<span class="pill p-lesson">🎹 鋼琴課</span>`);
+  if(day.holiday)         pills.push(`<span class="pill p-holiday">🎆 美國國慶日</span>`);
+  if(pills.length) html+=`<div class="pills">${pills.join("")}</div>`;
+  else html+=`</div>`;
+
+  if(day.free){
+    html+=`<div class="free-today">
+      <div class="free-today-icon">🌈</div>
+      <div class="free-today-zh">自由日！今天完全休息</div>
+      <div class="free-today-en">Free Day! Total rest today 🎈</div>
+    </div>`;
+  } else {
+    html+=`<div class="big-tasks">`;
+    (day.tasks||[]).forEach(t=>{
+      const checked=isDone(wi,di,t);
+      const def=T[t];
+      html+=`<div class="big-task${checked?" done-task":""}${locked?" locked-task":""}" onclick="${locked?"":"toggle("+wi+","+di+",'"+t+"',event)"}">
+        <div class="big-cb${checked?" on":""}"><span class="big-cb-mark">✓</span></div>
+        <div class="big-t-info">
+          <div class="big-t-en${checked?" done":""}" style="color:${checked?"#ccc":def.color}">${def.emoji} ${def.en}</div>
+          <div class="big-t-zh${checked?" done":""}">${def.zh} <span class="big-t-min">${def.min}</span></div>
+        </div>
+      </div>`;
+    });
+    html+=`</div>`;
+
+    // IXL inline section
+    const ixlCount=getIxlCount(wi);
+    const mods=IXL_WEEKS[wi];
+    html+=`<div class="ixl-section">
+      <button class="ixl-toggle-btn" onclick="toggleIxlInline()">
+        <div class="ixl-btn-left">
+          <span class="ixl-btn-icon">📚</span>
+          <div>
+            <div class="ixl-btn-title">IXL 本週任務</div>
+            <div class="ixl-btn-zh">IXL This Week</div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:6px">
+          <span class="ixl-btn-count">${ixlCount}/2</span>
+          <span class="ixl-chevron${ixlInlineOpen?" open":""}" id="ixl-chevron">▼</span>
+        </div>
+      </button>
+      <div class="ixl-mods-list${ixlInlineOpen?" open":""}" id="ixl-inline-mods">`;
+
+    mods.forEach(m=>{
+      const done=isIxlDone(m.id);
+      html+=`<div class="ixl-mod-row${done?" done-mod":""}" onclick="toggleIxlMod('${m.id}',event)">
+        <div class="ixl-mod-cb${done?" on":""}"><span class="ixl-mod-cb-mark">✓</span></div>
+        <div class="ixl-mod-emoji">${m.emoji}</div>
+        <div class="ixl-mod-info">
+          <div class="ixl-mod-title${done?" done":""}">${m.title}</div>
+          <div class="ixl-mod-zh">${m.zh}</div>
+          <div class="ixl-mod-desc">${m.desc}</div>
+        </div>
+      </div>`;
+    });
+    html+=`</div></div>`;
+  }
+
+  el.innerHTML=html;
+}
+
+// ── RENDER WEEK VIEW ──
+function renderWeekView(){
+  const wi=activeWeek;
+  const wk=WEEKS[wi];
+  const locked=isLocked(wi);
+  document.getElementById("wk-dates-label").textContent=wk.dates+(locked?" · coming soon 🔒":"");
+  const ixlCount=getIxlCount(wi);
+  document.getElementById("wk-ixl-cnt").textContent=`${ixlCount}/2 ✓`;
+
+  const grid=document.getElementById("days-grid");
+  grid.innerHTML="";
+  wk.days.forEach((d,di)=>{
+    const dayDone=isDayDone(wi,di);
+    const cls=["day",d.free?"is-free":"",(!d.free&&dayDone)?"complete":"",locked?"is-locked":""].filter(Boolean).join(" ");
+    let html=`<div class="${cls}">
+      <div class="day-accent acc-${d.dow}"></div>
+      <div class="day-body">
+        <div class="day-dow-row">
+          <span class="day-dow">${d.dow}</span>
+          <span class="day-dow-zh">${DOW_ZH[d.dow]}</span>
+        </div>
+        <div class="day-date">${d.date}</div>`;
+
+    const pills=[];
+    if(d.camp==="swim")   pills.push(`<span class="pill p-swim">🏊 游泳</span>`);
+    if(d.camp==="tennis") pills.push(`<span class="pill p-tennis">🎾 網球</span>`);
+    if(d.lesson)          pills.push(`<span class="pill p-lesson">🎹 鋼琴課</span>`);
+    if(d.holiday)         pills.push(`<span class="pill p-holiday">🎆 國慶</span>`);
+    if(pills.length) html+=`<div class="pills" style="margin-bottom:8px">${pills.join("")}</div>`;
+
+    if(d.free){
+      html+=`<div class="day-free-body">
+        <div class="day-free-icon">🌈</div>
+        <div class="day-free-zh">自由日！</div>
+        <div class="day-free-en">Free Day!</div>
+      </div>`;
+    } else {
+      html+=`<div class="tasks">`;
+      (d.tasks||[]).forEach(t=>{
+        const checked=isDone(wi,di,t);
+        const def=T[t];
+        const cls2=locked?"task locked-task":"task";
+        const handler=locked?"":"onclick=\"toggle("+wi+","+di+",'"+t+"',event)\"";
+        html+=`<div class="${cls2}" ${handler}>
+          <div class="cb${checked?" on":""}"><span class="cb-mark">✓</span></div>
+          <div class="t-info">
+            <div class="t-en${checked?" done":""}" style="color:${checked?"#ccc":def.color}">${def.emoji} ${def.en}</div>
+            <div class="t-zh${checked?" done":""}">${def.zh} <span class="t-min">${def.min}</span></div>
+          </div>
+        </div>`;
+      });
+      html+=`</div>`;
+    }
+    html+=`</div></div>`;
+    grid.insertAdjacentHTML("beforeend",html);
+  });
+}
+
+// ── MAIN RENDER ──
+function render(){
+  renderHeader();
+  renderWkTabs();
+  if(activeView==="today") renderTodayView();
+  else renderWeekView();
+}
+
+// ── INIT ──
+// Set activeWeek to current week, auto-show today's week tab
+const todayInfo=getTodayInfo();
+if(todayInfo) activeWeek=todayInfo.wi;
+render();
+</script>
+</body>
+</html>
