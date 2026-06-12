@@ -329,6 +329,33 @@ body { font-family: 'Nunito', system-ui, sans-serif; background: #FFF8EE; min-he
 }
 .ixl-sheet-mods { max-height: 55vh; overflow-y: auto; }
 
+/* ── POSTPONE ── */
+.postpone-btn {
+  font-size: 11px; font-weight: 800; color: #bbb;
+  background: #F5F5F5; border: 1.5px solid #E8E0CC; border-radius: 12px;
+  padding: 4px 8px; cursor: pointer; font-family: 'Nunito', sans-serif;
+  flex-shrink: 0; transition: all 0.15s; line-height: 1;
+}
+.postpone-btn:hover { background: #EEE; color: #888; }
+.postponed-badge {
+  font-size: 10px; font-weight: 800; color: #FD79A8;
+  background: #FFF0F5; border: 1.5px solid #FFD6E7; border-radius: 8px;
+  padding: 2px 7px; flex-shrink: 0;
+}
+.from-yest-badge {
+  font-size: 10px; font-weight: 800; color: #6C5CE7;
+  background: #F5F3FF; border: 1.5px solid #D6CEFF; border-radius: 8px;
+  padding: 2px 7px; flex-shrink: 0;
+}
+.wk-zh-btn {
+  display: flex; align-items: center; gap: 6px;
+  background: #FFF5F8; border: 2px solid #FFD6E7; border-radius: 20px;
+  padding: 7px 12px; cursor: pointer; font-family: 'Nunito', sans-serif;
+  transition: background 0.15s;
+}
+.wk-zh-btn:hover { background: #FFE8F1; }
+.wk-zh-lbl { font-size: 13px; color: #C0392B; font-weight: 800; }
+
 /* ── CONFETTI ── */
 .confetti-piece { position: fixed; pointer-events: none; z-index: 9999; border-radius: 2px; }
 .mini-praise {
@@ -390,10 +417,15 @@ body { font-family: 'Nunito', system-ui, sans-serif; background: #FFF8EE; min-he
 <div class="week-view" id="week-view">
   <div class="wk-header">
     <span class="wk-dates" id="wk-dates-label">—</span>
-    <button class="wk-ixl-btn" id="wk-ixl-btn" onclick="openIxlDropdown(event)">
-      <span class="wk-ixl-lbl">📚 IXL</span>
-      <span class="wk-ixl-cnt" id="wk-ixl-cnt">0/2</span>
-    </button>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button class="wk-ixl-btn" id="wk-ixl-btn" onclick="openIxlDropdown(event)">
+        <span class="wk-ixl-lbl">📚 IXL</span>
+        <span class="wk-ixl-cnt" id="wk-ixl-cnt">0/76</span>
+      </button>
+      <button class="wk-zh-btn" onclick="openZhDropdown(event)">
+        <span class="wk-zh-lbl">📖 中文影片</span>
+      </button>
+    </div>
   </div>
   <div class="days" id="days-grid"></div>
 </div>
@@ -453,16 +485,17 @@ body { font-family: 'Nunito', system-ui, sans-serif; background: #FFF8EE; min-he
       </div>
     </a>
 
-    <div class="zh-section-label" style="margin-top:6px">📅 七月底再看 Watch late July</div>
-
-    <a href="https://www.youtube.com/watch?v=_Ghtr4U4be4"
-       target="_blank" class="zh-link-card zh-link-latejuly" onclick="closeZhDropdown()" style="padding:11px 14px">
-      <div class="zh-link-icon" style="font-size:24px">🔤</div>
-      <div class="zh-link-info">
-        <div class="zh-link-title" style="font-size:16px">注音符號複習</div>
-        <div class="zh-link-sub">Pinyin/Zhuyin review · before 2nd grade starts</div>
-      </div>
-    </a>
+    <div id="zh-latejuly-section" style="display:none;flex-direction:column;gap:6px">
+      <div class="zh-section-label" style="margin-top:6px">📅 七月底再看 Watch late July</div>
+      <a href="https://www.youtube.com/watch?v=_Ghtr4U4be4"
+         target="_blank" class="zh-link-card zh-link-latejuly" onclick="closeZhDropdown()" style="padding:11px 14px">
+        <div class="zh-link-icon" style="font-size:24px">🔤</div>
+        <div class="zh-link-info">
+          <div class="zh-link-title" style="font-size:16px">注音符號複習</div>
+          <div class="zh-link-sub">Pinyin/Zhuyin review · before 2nd grade starts</div>
+        </div>
+      </a>
+    </div>
 
   </div>
 </div>
@@ -787,6 +820,26 @@ function showDayToast(){
   setTimeout(()=>{el.classList.remove("show");setTimeout(()=>el.remove(),400);},2600);
 }
 
+// ── POSTPONE HELPERS ──
+const postponeKey = (wi,di,t) => `pst_${wi}_${di}_${t}`;
+const isPostponed = (wi,di,t) => !!S[postponeKey(wi,di,t)];
+function nextDay(wi,di){
+  if(di+1 < WEEKS[wi].days.length) return {wi, di:di+1};
+  if(wi+1 < WEEKS.length) return {wi:wi+1, di:0};
+  return null;
+}
+function prevDay(wi,di){
+  if(di>0) return {wi, di:di-1};
+  if(wi>0) return {wi:wi-1, di:WEEKS[wi-1].days.length-1};
+  return null;
+}
+function postponeTask(wi,di,t,evt){
+  if(evt) evt.stopPropagation();
+  if(!nextDay(wi,di)) return;
+  S[postponeKey(wi,di,t)] = true;
+  save(); render();
+}
+
 // ── ACTIONS ──
 function toggle(wi,di,t,evt){
   if(isLocked(wi)) return;
@@ -904,6 +957,9 @@ function openZhDropdown(evt){
   const doneCnt = isZhDone('zh_ep1') + isZhDone('zh_ep2');
   const sub=document.getElementById('zh-dd-sub');
   if(sub) sub.textContent = doneCnt===2 ? '必看全部完成！🎉 All required done!' : `${doneCnt}/2 必看完成 · 每天看一集 🎯`;
+  // Show pinyin section only in Week 7 (last week of summer)
+  const lj = document.getElementById('zh-latejuly-section');
+  if(lj) lj.style.display = activeWeek >= 6 ? 'flex' : 'none';
   dd.classList.add("open");
   document.getElementById("zh-dd-backdrop").classList.add("open");
 }
@@ -972,7 +1028,7 @@ function renderWkTabs(){
     const btn=document.createElement("button");
     btn.className="wk-tab"+(wi===activeWeek?" on":"")+(allDone&&!locked?" done":"")+(locked?" locked":"");
     btn.textContent=wk.label+(allDone&&!locked?" ✓":"");
-    btn.onclick=()=>{ activeWeek=wi; if(activeView==="week") renderWeekView(); renderWkTabs(); };
+    btn.onclick=()=>{ activeWeek=wi; switchView('week'); };
     el.appendChild(btn);
   });
 }
@@ -1029,39 +1085,94 @@ function renderTodayView(){
     </div>`;
   } else {
     html+=`<div class="big-tasks">`;
+
+    // Tasks postponed from yesterday — show at top
+    const prev=prevDay(wi,di);
+    if(prev){
+      (WEEKS[prev.wi].days[prev.di].tasks||[]).forEach(t=>{
+        if(!isPostponed(prev.wi,prev.di,t)) return;
+        const checked=isDone(prev.wi,prev.di,t);
+        const def=T[t];
+        if(t==="math"){
+          const cnt=getIxlCount(), perDay=Math.ceil((IXL_TOTAL-cnt)/remainingMathDays());
+          html+=`<div class="big-task${checked?" done-task":""}" onclick="openIxlDropdown(event)">
+            <div class="big-cb${checked?" on":""}" onclick="event.stopPropagation();toggle(${prev.wi},${prev.di},'math',event)"><span class="big-cb-mark">✓</span></div>
+            <div class="big-t-info">
+              <div class="big-t-en${checked?" done":""}" style="color:${checked?"#ccc":def.color}">${def.emoji} ${def.zh}</div>
+              <div class="big-t-zh${checked?" done":""}">${def.en}</div>
+            </div>
+            <div style="text-align:right;flex-shrink:0;display:flex;flex-direction:column;align-items:flex-end;gap:4px">
+              <span class="from-yest-badge">← 昨天</span>
+              <div style="font-size:11px;font-weight:800;color:#7AAAE0">${cnt}/${IXL_TOTAL} ▾</div>
+            </div>
+          </div>`;
+        } else if(t==="chinese"){
+          html+=`<div class="big-task${checked?" done-task":""}" onclick="openZhDropdown(event)">
+            <div class="big-cb${checked?" on":""}" onclick="event.stopPropagation();toggle(${prev.wi},${prev.di},'chinese',event)"><span class="big-cb-mark">✓</span></div>
+            <div class="big-t-info">
+              <div class="big-t-en${checked?" done":""}" style="color:${checked?"#ccc":def.color}">${def.emoji} ${def.zh}</div>
+              <div class="big-t-zh${checked?" done":""}">${def.en}</div>
+            </div>
+            <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0">
+              <span class="from-yest-badge">← 昨天</span>
+              <span style="font-size:12px;font-weight:800;color:#E74C3C">▶ 看影片</span>
+            </div>
+          </div>`;
+        } else {
+          html+=`<div class="big-task${checked?" done-task":""}" onclick="toggle(${prev.wi},${prev.di},'${t}',event)">
+            <div class="big-cb${checked?" on":""}"><span class="big-cb-mark">✓</span></div>
+            <div class="big-t-info">
+              <div class="big-t-en${checked?" done":""}" style="color:${checked?"#ccc":def.color}">${def.emoji} ${def.zh}</div>
+              <div class="big-t-zh${checked?" done":""}">${def.en}</div>
+            </div>
+            <span class="from-yest-badge">← 昨天</span>
+          </div>`;
+        }
+      });
+    }
+
     (day.tasks||[]).forEach(t=>{
       const checked=isDone(wi,di,t);
+      const postponed=isPostponed(wi,di,t);
       const def=T[t];
+      const canPostpone=!checked && !postponed && !!nextDay(wi,di);
+      const pBtn=canPostpone ? `<button class="postpone-btn" onclick="postponeTask(${wi},${di},'${t}',event)">→ 明天</button>` : '';
+      const pBadge=postponed ? `<span class="postponed-badge">→ 明天</span>` : '';
       if(t==="math" && !locked){
         const cnt=getIxlCount();
         const perDay=Math.ceil((IXL_TOTAL-cnt)/remainingMathDays());
-        html+=`<div class="big-task${checked?" done-task":""}" onclick="openIxlDropdown(event)">
+        html+=`<div class="big-task${checked?" done-task":""}${postponed?" done-task":""}" onclick="openIxlDropdown(event)">
           <div class="big-cb${checked?" on":""}" onclick="event.stopPropagation();toggle(${wi},${di},'math',event)"><span class="big-cb-mark">✓</span></div>
           <div class="big-t-info">
-            <div class="big-t-en${checked?" done":""}" style="color:${checked?"#ccc":def.color}">${def.emoji} ${def.zh}</div>
+            <div class="big-t-en${checked||postponed?" done":""}" style="color:${checked||postponed?"#ccc":def.color}">${def.emoji} ${def.zh}</div>
             <div class="big-t-zh${checked?" done":""}">${def.en} <span class="big-t-min">${def.min}</span></div>
           </div>
-          <div style="text-align:right;flex-shrink:0">
+          <div style="text-align:right;flex-shrink:0;display:flex;flex-direction:column;align-items:flex-end;gap:4px">
+            ${pBadge}${pBtn}
             <div style="font-size:13px;font-weight:800;color:#7AAAE0">${cnt}/${IXL_TOTAL} ▾</div>
-            <div style="font-size:11px;font-weight:800;color:#FD79A8;margin-top:2px">~${perDay} 今天 🎯</div>
+            <div style="font-size:11px;font-weight:800;color:#FD79A8">~${perDay} 今天 🎯</div>
           </div>
         </div>`;
       } else if(t==="chinese" && !locked){
-        html+=`<div class="big-task${checked?" done-task":""}" onclick="openZhDropdown(event)">
+        html+=`<div class="big-task${checked||postponed?" done-task":""}" onclick="openZhDropdown(event)">
           <div class="big-cb${checked?" on":""}" onclick="event.stopPropagation();toggle(${wi},${di},'chinese',event)"><span class="big-cb-mark">✓</span></div>
           <div class="big-t-info">
-            <div class="big-t-en${checked?" done":""}" style="color:${checked?"#ccc":def.color}">${def.emoji} ${def.zh}</div>
+            <div class="big-t-en${checked||postponed?" done":""}" style="color:${checked||postponed?"#ccc":def.color}">${def.emoji} ${def.zh}</div>
             <div class="big-t-zh${checked?" done":""}">${def.en} <span class="big-t-min">${def.min}</span></div>
           </div>
-          <div style="font-size:13px;font-weight:800;color:#E74C3C;flex-shrink:0">▶ 看影片</div>
+          <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0">
+            ${pBadge}${pBtn}
+            <span style="font-size:13px;font-weight:800;color:#E74C3C">▶ 看影片</span>
+          </div>
         </div>`;
       } else {
-        html+=`<div class="big-task${checked?" done-task":""}${locked?" locked-task":""}" onclick="${locked?"":"toggle("+wi+","+di+",'"+t+"',event)"}">
+        html+=`<div class="big-task${checked||postponed?" done-task":""}${locked?" locked-task":""}" onclick="${locked?"":"toggle("+wi+","+di+",'"+t+"',event)"}">
           <div class="big-cb${checked?" on":""}"><span class="big-cb-mark">✓</span></div>
           <div class="big-t-info">
-            <div class="big-t-en${checked?" done":""}" style="color:${checked?"#ccc":def.color}">${def.emoji} ${def.zh}</div>
+            <div class="big-t-en${checked||postponed?" done":""}" style="color:${checked||postponed?"#ccc":def.color}">${def.emoji} ${def.zh}</div>
             <div class="big-t-zh${checked?" done":""}">${def.en} <span class="big-t-min">${def.min}</span></div>
           </div>
+          ${pBadge}${pBtn}
         </div>`;
       }
     });
@@ -1110,17 +1221,49 @@ function renderWeekView(){
       </div>`;
     } else {
       html+=`<div class="tasks">`;
+      // Tasks postponed from previous day
+      const prevD=prevDay(wi,di);
+      if(prevD){
+        (WEEKS[prevD.wi].days[prevD.di].tasks||[]).forEach(t=>{
+          if(!isPostponed(prevD.wi,prevD.di,t)) return;
+          const checked=isDone(prevD.wi,prevD.di,t);
+          const def=T[t];
+          const handler=t==="math"?"onclick=\"openIxlDropdown(event)\""
+                        :t==="chinese"?"onclick=\"openZhDropdown(event)\""
+                        :`onclick="toggle(${prevD.wi},${prevD.di},'${t}',event)"`;
+          html+=`<div class="task" ${handler}>
+            <div class="cb${checked?" on":""}" onclick="event.stopPropagation();toggle(${prevD.wi},${prevD.di},'${t}',event)"><span class="cb-mark">✓</span></div>
+            <div class="t-info">
+              <div class="t-en${checked?" done":""}" style="color:${checked?"#ccc":def.color}">${def.emoji} ${def.zh}</div>
+            </div>
+            <span class="from-yest-badge">←</span>
+          </div>`;
+        });
+      }
       (d.tasks||[]).forEach(t=>{
         const checked=isDone(wi,di,t);
+        const postponed=isPostponed(wi,di,t);
         const def=T[t];
-        const cls2=locked?"task locked-task":"task";
-        const handler=locked?"":"onclick=\"toggle("+wi+","+di+",'"+t+"',event)\"";
-        html+=`<div class="${cls2}" ${handler}>
-          <div class="cb${checked?" on":""}"><span class="cb-mark">✓</span></div>
+        let handler, rightSide='';
+        if(!locked && t==="math"){
+          const cnt=getIxlCount();
+          handler=`onclick="openIxlDropdown(event)"`;
+          rightSide=`<span style="font-size:10px;font-weight:800;color:#7AAAE0;flex-shrink:0">${cnt}/${IXL_TOTAL}</span>`;
+        } else if(!locked && t==="chinese"){
+          handler=`onclick="openZhDropdown(event)"`;
+          rightSide=`<span style="font-size:11px;font-weight:800;color:#E74C3C;flex-shrink:0">▶</span>`;
+        } else {
+          handler=locked?"":`onclick="toggle(${wi},${di},'${t}',event)"`;
+        }
+        if(postponed) rightSide=`<span class="postponed-badge">→</span>`;
+        const cbHandler=(!locked&&(t==="math"||t==="chinese"))?`onclick="event.stopPropagation();toggle(${wi},${di},'${t}',event)"`:"";
+        html+=`<div class="task${locked?" locked-task":""}" ${handler}>
+          <div class="cb${checked?" on":""}" ${cbHandler}><span class="cb-mark">✓</span></div>
           <div class="t-info">
-            <div class="t-en${checked?" done":""}" style="color:${checked?"#ccc":def.color}">${def.emoji} ${def.zh}</div>
+            <div class="t-en${checked||postponed?" done":""}" style="color:${checked||postponed?"#ccc":def.color}">${def.emoji} ${def.zh}</div>
             <div class="t-zh${checked?" done":""}">${def.en} <span class="t-min">${def.min}</span></div>
           </div>
+          ${rightSide}
         </div>`;
       });
       html+=`</div>`;
