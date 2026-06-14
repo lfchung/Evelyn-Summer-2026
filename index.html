@@ -421,9 +421,66 @@ body { font-family: 'Nunito', system-ui, sans-serif; background: #FFF8EE; min-he
 .toast-emoji { font-size: 52px; margin-bottom: 10px; }
 .toast-en { font-size: 22px; font-weight: 900; color: #1a1a1a; }
 .toast-zh { font-size: 20px; font-weight: 800; color: #6C5CE7; margin-top: 6px; }
+
+/* ── PASSWORD GATE ── */
+.pw-gate {
+  position: fixed; inset: 0; z-index: 99999;
+  display: flex; align-items: center; justify-content: center;
+}
+.pw-backdrop {
+  position: absolute; inset: 0;
+  background: rgba(255,248,238,0.72);
+  backdrop-filter: blur(6px) grayscale(0.4);
+  -webkit-backdrop-filter: blur(6px) grayscale(0.4);
+}
+.pw-card {
+  position: relative; z-index: 1;
+  background: #fff; border-radius: 24px;
+  padding: 36px 32px 28px;
+  box-shadow: 0 12px 48px rgba(0,0,0,0.14);
+  border: 2px solid #F0EAD6;
+  text-align: center; width: min(320px, calc(100vw - 40px));
+}
+.pw-emoji { font-size: 44px; margin-bottom: 10px; }
+.pw-title { font-size: 20px; font-weight: 900; color: #1a1a1a; margin-bottom: 4px; }
+.pw-sub { font-size: 13px; color: #aaa; font-weight: 600; margin-bottom: 20px; }
+.pw-input {
+  width: 100%; padding: 13px 16px; border-radius: 14px;
+  border: 2px solid #E8E0CC; font-size: 16px; font-family: 'Nunito', sans-serif;
+  font-weight: 700; text-align: center; outline: none; color: #1a1a1a;
+  transition: border-color 0.2s;
+}
+.pw-input:focus { border-color: #6C5CE7; }
+.pw-input.shake { animation: shake 0.4s; border-color: #e17055; }
+.pw-btn {
+  margin-top: 12px; width: 100%; padding: 13px;
+  background: #6C5CE7; color: #fff; border: none; border-radius: 14px;
+  font-size: 16px; font-weight: 900; font-family: 'Nunito', sans-serif;
+  cursor: pointer; transition: background 0.15s;
+}
+.pw-btn:hover { background: #5a4bd1; }
+.pw-error { font-size: 12px; color: #e17055; font-weight: 700; margin-top: 8px; min-height: 16px; }
+@keyframes shake {
+  0%,100% { transform: translateX(0); }
+  20%,60%  { transform: translateX(-6px); }
+  40%,80%  { transform: translateX(6px); }
+}
 </style>
 </head>
 <body>
+
+<!-- PASSWORD GATE -->
+<div class="pw-gate" id="pw-gate">
+  <div class="pw-backdrop"></div>
+  <div class="pw-card">
+    <div class="pw-emoji">⭐</div>
+    <div class="pw-title">愛的暑假 2026</div>
+    <div class="pw-sub">Evelyn's Summer Tracker · Enter password to continue</div>
+    <input class="pw-input" id="pw-input" type="password" placeholder="Password" onkeydown="if(event.key==='Enter')checkPw()">
+    <button class="pw-btn" onclick="checkPw()">Enter →</button>
+    <div class="pw-error" id="pw-error"></div>
+  </div>
+</div>
 
 <!-- HEADER -->
 <div class="hdr">
@@ -1336,6 +1393,29 @@ function render(){
   renderWkTabs();
   if(selectedDay) renderDayDetail(selectedDay.wi, selectedDay.di);
   else renderWeekView();
+}
+
+// ── PASSWORD GATE ──
+const PW = 'Lisa-Anne';
+function checkPw(){
+  const val = document.getElementById('pw-input').value;
+  if(val === PW){
+    sessionStorage.setItem('pw_ok','1');
+    const gate = document.getElementById('pw-gate');
+    gate.style.transition = 'opacity 0.4s';
+    gate.style.opacity = '0';
+    setTimeout(()=>gate.remove(), 420);
+  } else {
+    const input = document.getElementById('pw-input');
+    const err = document.getElementById('pw-error');
+    input.classList.add('shake');
+    err.textContent = 'Incorrect password — try again';
+    input.value = '';
+    setTimeout(()=>input.classList.remove('shake'), 420);
+  }
+}
+if(sessionStorage.getItem('pw_ok')==='1'){
+  document.getElementById('pw-gate').remove();
 }
 
 // ── INIT ──
