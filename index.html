@@ -228,37 +228,36 @@ body { font-family: 'Nunito', system-ui, sans-serif; background: #FFF8EE; min-he
 .acc-Sat { background: linear-gradient(90deg,#fdcb6e,#ffeaa7); }
 .acc-Sun { background: #F0EAD6; }
 
-.day-body { padding: 10px 11px 12px; }
+.day-body { padding: 8px 10px 10px; }
 .day-dow-row { display: flex; align-items: baseline; gap: 4px; }
 .day-dow { font-size: 10px; font-weight: 800; color: #bbb; text-transform: uppercase; letter-spacing: 0.06em; }
 .day-dow-zh { font-size: 11px; font-weight: 700; color: #ccc; }
-.day-date { font-size: 15px; font-weight: 900; color: #1a1a1a; margin: 3px 0 8px; }
+.day-date { font-size: 15px; font-weight: 900; color: #1a1a1a; margin: 2px 0 6px; }
 
 .day-free-body { text-align: center; padding: 14px 0 10px; }
 .day-free-icon { font-size: 32px; }
 .day-free-zh { font-size: 13px; font-weight: 800; color: #c8b9a0; margin-top: 4px; }
 .day-free-en { font-size: 11px; font-weight: 700; color: #d5c9b5; }
 
-.tasks { display: flex; flex-direction: column; gap: 5px; }
+.tasks { display: flex; flex-direction: column; gap: 3px; }
 .task {
-  display: flex; align-items: center; gap: 7px;
+  display: flex; align-items: center; gap: 8px;
   padding: 5px 4px; border-radius: 10px;
   cursor: pointer; transition: background 0.1s; -webkit-tap-highlight-color: transparent;
 }
 .task:hover { background: #f7f3ea; }
 .task.locked-task { cursor: not-allowed; pointer-events: none; }
 
-.cb { width: 25px; height: 25px; border-radius: 7px; flex-shrink: 0; border: 2.5px solid #ddd; display: flex; align-items: center; justify-content: center; transition: all 0.2s cubic-bezier(0.34,1.56,0.64,1); background: #fff; }
+.cb { width: 26px; height: 26px; border-radius: 7px; flex-shrink: 0; border: 2.5px solid #ddd; display: flex; align-items: center; justify-content: center; transition: all 0.2s cubic-bezier(0.34,1.56,0.64,1); background: #fff; }
 .cb.on { border-color: #00B894; background: #00B894; transform: scale(1.15); }
 .cb-mark { display: none; color: #fff; font-size: 14px; font-weight: 900; }
 .cb.on .cb-mark { display: block; }
 
 .t-info { flex: 1; min-width: 0; }
-.t-en { font-size: 13px; font-weight: 800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; transition: color 0.2s; }
+.t-en { font-size: 15px; font-weight: 800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; transition: color 0.2s; }
 .t-en.done { color: #ccc !important; text-decoration: line-through; }
-.t-zh { font-size: 11px; font-weight: 600; color: #bbb; margin-top: 1px; }
-.t-zh.done { color: #ddd; text-decoration: line-through; }
-.t-min { font-size: 10px; color: #ccc; font-weight: 600; }
+.t-zh { display: none; }
+.t-min { font-size: 11px; color: #bbb; font-weight: 600; margin-left: 4px; }
 
 /* ── IXL BOTTOM SHEET OVERLAY ── */
 .ixl-overlay {
@@ -1420,12 +1419,12 @@ function renderWeekView(){
           handler=locked?"":`onclick="toggle(${wi},${di},'${t}',event)"`;
         }
         if(postponed) rightSide=`<span class="postponed-badge">→</span>`;
+        const dispMin = (t==='reading' && (d.tasks||[]).includes('nonfiction')) ? '15分' : def.min;
         const cbHandler=(!locked&&(t==="math"||t==="chinese"))?`onclick="event.stopPropagation();toggle(${wi},${di},'${t}',event)"`:"";
         html+=`<div class="task${locked?" locked-task":""}" ${handler}>
           <div class="cb${checked?" on":""}" ${cbHandler}><span class="cb-mark">✓</span></div>
           <div class="t-info">
-            <div class="t-en${checked||postponed?" done":""}" style="color:${checked||postponed?"#ccc":def.color}">${def.emoji} ${def.zh}</div>
-            <div class="t-zh${checked?" done":""}">${def.en} <span class="t-min">${def.min}</span></div>
+            <div class="t-en${checked||postponed?" done":""}" style="color:${checked||postponed?"#ccc":def.color}">${def.emoji} ${def.zh} <span class="t-min">${dispMin}</span></div>
           </div>
           ${rightSide}
         </div>`;
