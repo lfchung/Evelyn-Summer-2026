@@ -4,6 +4,10 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>愛的暑假 2026</title>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="apple-touch-icon" href="favicon.svg">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Evelyn 2026">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
@@ -498,6 +502,7 @@ body { font-family: 'Nunito', system-ui, sans-serif; background: #FFF8EE; min-he
     <div class="chip-date" id="chip-date">—</div>
     <div class="chip-prog" id="chip-prog">—</div>
     <div class="chip-label">今天完成 done</div>
+    <div id="sync-status" style="font-size:10px;opacity:0.4;margin-top:3px;font-weight:700;display:none"></div>
   </div>
 </div>
 
@@ -794,7 +799,49 @@ const WEEKS = [
 // ── STATE ──
 const SK = "evelyn_s26_v4";
 let S = JSON.parse(localStorage.getItem(SK)||"{}");
-const save = () => localStorage.setItem(SK, JSON.stringify(S));
+
+// ── GOOGLE SHEETS SYNC ──
+const SHEET_URL = ""; // ← paste your Apps Script URL here after deploying
+const SHEET_TOKEN = "evelyn2026";
+let syncTimeout = null;
+
+function save(){
+  localStorage.setItem(SK, JSON.stringify(S));
+  if(!SHEET_URL) return;
+  clearTimeout(syncTimeout);
+  syncTimeout = setTimeout(pushToSheet, 1200); // debounce: wait 1.2s after last change
+}
+
+async function pushToSheet(){
+  try {
+    setSyncStatus("syncing");
+    await fetch(`${SHEET_URL}?token=${SHEET_TOKEN}`, {
+      method:"POST", body:JSON.stringify(S)
+    });
+    setSyncStatus("ok");
+  } catch(e){ setSyncStatus("err"); }
+}
+
+async function pullFromSheet(){
+  if(!SHEET_URL) return;
+  try {
+    setSyncStatus("syncing");
+    const res = await fetch(`${SHEET_URL}?token=${SHEET_TOKEN}`);
+    const remote = await res.json();
+    if(remote && !remote.error){
+      S = {...S, ...remote};
+      localStorage.setItem(SK, JSON.stringify(S));
+    }
+    setSyncStatus("ok");
+  } catch(e){ setSyncStatus("err"); }
+}
+
+function setSyncStatus(s){
+  const el = document.getElementById("sync-status");
+  if(!el) return;
+  el.textContent = s==="syncing"?"☁️ syncing…": s==="ok"?"☁️ ✓":"⚠️ offline";
+  el.style.opacity = s==="ok" ? "0.4" : "1";
+}
 
 // ── DATE HELPERS ──
 const MONTHS = {Jan:0,Feb:1,Mar:2,Apr:3,May:4,Jun:5,Jul:6,Aug:7,Sep:8,Oct:9,Nov:10,Dec:11};
@@ -1505,6 +1552,10 @@ if(sessionStorage.getItem('pw_ok')==='1'){
 const todayInfo=getTodayInfo();
 if(todayInfo){ activeWeek=todayInfo.wi; selectedDay={wi:todayInfo.wi, di:todayInfo.di}; }
 render();
+if(SHEET_URL){
+  document.getElementById('sync-status').style.display='block';
+  pullFromSheet().then(()=>render());
+}
 </script>
 </body>
 </html>
