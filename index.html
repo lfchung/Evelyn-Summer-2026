@@ -23,8 +23,8 @@ body { font-family: 'Nunito', system-ui, sans-serif; background: #FFF8EE; min-he
   display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;
 }
 .hdr-left { flex: 1; min-width: 160px; }
-.hdr-title { font-size: 20px; font-weight: 900; text-shadow: 0 1px 4px rgba(0,0,0,0.2); line-height: 1.25; }
-.hdr-sub { font-size: 12px; opacity: 0.8; margin-top: 2px; font-weight: 600; }
+.hdr-title { font-size: 24px; font-weight: 900; text-shadow: 0 1px 4px rgba(0,0,0,0.2); line-height: 1.25; }
+.hdr-sub { font-size: 14px; opacity: 0.8; margin-top: 2px; font-weight: 600; }
 .today-chip {
   background: rgba(255,255,255,0.22); border-radius: 16px;
   padding: 9px 16px; text-align: center; white-space: nowrap; flex-shrink: 0;
@@ -110,11 +110,11 @@ body { font-family: 'Nunito', system-ui, sans-serif; background: #FFF8EE; min-he
 .big-cb.on .big-cb-mark { display: block; }
 
 .big-t-info { flex: 1; }
-.big-t-en { font-size: 20px; font-weight: 800; transition: color 0.2s; }
+.big-t-en { font-size: 24px; font-weight: 800; transition: color 0.2s; }
 .big-t-en.done { color: #ccc !important; text-decoration: line-through; }
-.big-t-zh { font-size: 14px; font-weight: 600; color: #aaa; margin-top: 2px; }
+.big-t-zh { font-size: 17px; font-weight: 600; color: #aaa; margin-top: 2px; }
 .big-t-zh.done { color: #ddd; text-decoration: line-through; }
-.big-t-min { font-size: 13px; color: #ccc; font-weight: 600; }
+.big-t-min { font-size: 15px; color: #ccc; font-weight: 600; }
 
 /* free day today */
 .free-today { text-align: center; padding: 48px 20px 36px; }
@@ -234,9 +234,9 @@ body { font-family: 'Nunito', system-ui, sans-serif; background: #FFF8EE; min-he
 
 .day-body { padding: 8px 10px 10px; }
 .day-dow-row { display: flex; align-items: baseline; gap: 4px; }
-.day-dow { font-size: 10px; font-weight: 800; color: #bbb; text-transform: uppercase; letter-spacing: 0.06em; }
-.day-dow-zh { font-size: 11px; font-weight: 700; color: #ccc; }
-.day-date { font-size: 15px; font-weight: 900; color: #1a1a1a; margin: 2px 0 6px; }
+.day-dow { font-size: 13px; font-weight: 800; color: #bbb; text-transform: uppercase; letter-spacing: 0.06em; }
+.day-dow-zh { font-size: 13px; font-weight: 700; color: #ccc; }
+.day-date { font-size: 19px; font-weight: 900; color: #1a1a1a; margin: 2px 0 6px; }
 
 .day-free-body { text-align: center; padding: 14px 0 10px; }
 .day-free-icon { font-size: 32px; }
@@ -258,10 +258,10 @@ body { font-family: 'Nunito', system-ui, sans-serif; background: #FFF8EE; min-he
 .cb.on .cb-mark { display: block; }
 
 .t-info { flex: 1; min-width: 0; }
-.t-en { font-size: 15px; font-weight: 800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; transition: color 0.2s; }
+.t-en { font-size: 18px; font-weight: 800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; transition: color 0.2s; }
 .t-en.done { color: #ccc !important; text-decoration: line-through; }
 .t-zh { display: none; }
-.t-min { font-size: 11px; color: #bbb; font-weight: 600; margin-left: 4px; }
+.t-min { font-size: 13px; color: #bbb; font-weight: 600; margin-left: 4px; }
 
 /* ── IXL BOTTOM SHEET OVERLAY ── */
 .ixl-overlay {
@@ -335,6 +335,29 @@ body { font-family: 'Nunito', system-ui, sans-serif; background: #FFF8EE; min-he
   padding: 2px 6px; flex-shrink: 0;
 }
 .ixl-sheet-mods { max-height: 55vh; overflow-y: auto; }
+
+/* ── SPINNER ── */
+.spin-btn {
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  width: 100%; padding: 14px;
+  background: linear-gradient(135deg, #6C5CE7, #a29bfe);
+  color: #fff; border: none; border-radius: 16px;
+  font-size: 18px; font-weight: 900; font-family: 'Nunito', sans-serif;
+  cursor: pointer; margin-bottom: 14px;
+  transition: transform 0.1s, opacity 0.1s;
+}
+.spin-btn:active { transform: scale(0.97); }
+.spin-btn:disabled { opacity: 0.5; cursor: default; }
+.spin-highlight {
+  animation: spinPulse 0.4s ease;
+  border: 3px solid #6C5CE7 !important;
+  box-shadow: 0 0 0 4px rgba(108,92,231,0.25) !important;
+}
+@keyframes spinPulse {
+  0%   { transform: scale(1); }
+  50%  { transform: scale(1.04); }
+  100% { transform: scale(1); }
+}
 
 /* ── POSTPONE ── */
 .postpone-btn {
@@ -972,6 +995,49 @@ function postponeTask(wi,di,t,evt){
 }
 
 // ── ACTIONS ──
+function spinForTask(wi,di){
+  const day=WEEKS[wi].days[di];
+  const pending=(day.tasks||[]).filter(t=>!isDone(wi,di,t)&&!isPostponed(wi,di,t));
+  if(pending.length===0) return;
+
+  const btn=document.getElementById('spin-btn');
+  if(btn) btn.disabled=true;
+
+  // find all big-task elements by iterating and matching data
+  const taskEls=[...document.querySelectorAll('.big-task')];
+
+  let ticks=0;
+  const totalTicks=14;
+  let lastIdx=-1;
+
+  function flash(){
+    // remove previous highlight
+    taskEls.forEach(el=>el.classList.remove('spin-highlight'));
+
+    const idx=Math.floor(Math.random()*pending.length);
+    // find element for this task
+    const el=taskEls.find(e=>e.dataset.task===pending[idx]);
+    if(el){ el.classList.add('spin-highlight'); lastIdx=idx; }
+
+    ticks++;
+    const delay=80+ticks*(ticks>10?30:10);
+    if(ticks<totalTicks) setTimeout(flash, delay);
+    else {
+      // land on final pick — keep highlight, scroll into view
+      if(el) el.scrollIntoView({behavior:'smooth',block:'nearest'});
+      if(btn) btn.disabled=false;
+      // mini praise
+      const praise=document.createElement('div');
+      praise.className='mini-praise';
+      praise.style.cssText=`top:40%;left:50%;transform:translateX(-50%)`;
+      praise.textContent='🎲 先做這個！';
+      document.body.appendChild(praise);
+      setTimeout(()=>praise.remove(),1000);
+    }
+  }
+  flash();
+}
+
 function toggle(wi,di,t,evt){
   if(evt) evt.stopPropagation();
   if(isLocked(wi)) return;
@@ -1239,6 +1305,11 @@ function renderDayDetail(wi, di){
   if(pills.length) html+=`<div class="pills">${pills.join("")}</div></div>`;
   else html+=`</div>`;
 
+  // spinner button — only show if there are pending tasks
+  if(!day.free && !day.makeup){
+    html+=`<button class="spin-btn" id="spin-btn" onclick="spinForTask(${wi},${di})">🎲 幫我選一個！Pick for me!</button>`;
+  }
+
   // ── Makeup Day ──
   if(day.makeup){
     const pending=getMakeupTasks(wi);
@@ -1356,7 +1427,7 @@ function renderDayDetail(wi, di){
       const pBadge=postponed ? `<span class="postponed-badge">→ 明天</span>` : '';
       if(t==="math" && !locked){
         const catDone=getIxlCatDone();
-        html+=`<div class="big-task${checked||postponed?" done-task":""}" onclick="openIxlDropdown(event)">
+        html+=`<div class="big-task${checked||postponed?" done-task":""}" data-task="math" onclick="openIxlDropdown(event)">
           <div class="big-cb${checked?" on":""}" onclick="event.stopPropagation();toggle(${wi},${di},'math',event)"><span class="big-cb-mark">✓</span></div>
           <div class="big-t-info">
             <div class="big-t-en${checked||postponed?" done":""}" style="color:${checked||postponed?"#ccc":def.color}">${def.emoji} ${def.zh}</div>
@@ -1369,7 +1440,7 @@ function renderDayDetail(wi, di){
           </div>
         </div>`;
       } else if(t==="chinese" && !locked){
-        html+=`<div class="big-task${checked||postponed?" done-task":""}" onclick="openZhDropdown(event)">
+        html+=`<div class="big-task${checked||postponed?" done-task":""}" data-task="chinese" onclick="openZhDropdown(event)">
           <div class="big-cb${checked?" on":""}" onclick="event.stopPropagation();toggle(${wi},${di},'chinese',event)"><span class="big-cb-mark">✓</span></div>
           <div class="big-t-info">
             <div class="big-t-en${checked||postponed?" done":""}" style="color:${checked||postponed?"#ccc":def.color}">${def.emoji} ${def.zh}</div>
@@ -1382,7 +1453,7 @@ function renderDayDetail(wi, di){
         </div>`;
       } else {
         const dispMin = (t==='reading' && hasNonfiction) ? '15分' : def.min;
-        html+=`<div class="big-task${checked||postponed?" done-task":""}${locked?" locked-task":""}" onclick="${locked?"":"toggle("+wi+","+di+",'"+t+"',event)"}">
+        html+=`<div class="big-task${checked||postponed?" done-task":""}${locked?" locked-task":""}" data-task="${t}" onclick="${locked?"":"toggle("+wi+","+di+",'"+t+"',event)"}">
           <div class="big-cb${checked?" on":""}"><span class="big-cb-mark">✓</span></div>
           <div class="big-t-info">
             <div class="big-t-en${checked||postponed?" done":""}" style="color:${checked||postponed?"#ccc":def.color}">${def.emoji} ${def.zh}</div>
