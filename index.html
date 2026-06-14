@@ -408,6 +408,26 @@ body { font-family: 'Nunito', system-ui, sans-serif; background: #FFF8EE; min-he
 .toast-en { font-size: 22px; font-weight: 900; color: #1a1a1a; }
 .toast-zh { font-size: 20px; font-weight: 800; color: #6C5CE7; margin-top: 6px; }
 
+/* ── LEGEND ── */
+.task-legend {
+  border-top: 2px solid #F0EAD6; background: #fff;
+  padding: 16px 20px 24px;
+}
+.legend-title {
+  font-size: 11px; font-weight: 900; color: #bbb;
+  text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 12px;
+}
+.legend-items {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 10px 16px;
+}
+.legend-item {
+  display: flex; align-items: center; gap: 10px;
+}
+.legend-emoji { font-size: 22px; flex-shrink: 0; }
+.legend-zh { font-size: 14px; font-weight: 800; color: #444; }
+.legend-py { font-size: 11px; font-weight: 600; color: #a29bfe; }
+.legend-en { font-size: 11px; font-weight: 600; color: #bbb; margin-top: 1px; }
+
 /* ── PASSWORD GATE ── */
 .pw-gate {
   position: fixed; inset: 0; z-index: 99999;
@@ -488,6 +508,20 @@ body { font-family: 'Nunito', system-ui, sans-serif; background: #FFF8EE; min-he
 
 <!-- MAIN CONTENT -->
 <div class="main-content" id="main-content"></div>
+
+<!-- LEGEND -->
+<div class="task-legend">
+  <div class="legend-title">任務說明 Task Guide</div>
+  <div class="legend-items">
+    <div class="legend-item"><span class="legend-emoji">🎹</span><div><div class="legend-zh">鋼琴 <span class="legend-py">gāng qín</span></div><div class="legend-en">Piano</div></div></div>
+    <div class="legend-item"><span class="legend-emoji">📚</span><div><div class="legend-zh">夏日探險 <span class="legend-py">xià rì tàn xiǎn</span></div><div class="legend-en">IXL Summer Adventures</div></div></div>
+    <div class="legend-item"><span class="legend-emoji">💻</span><div><div class="legend-zh">程式設計 <span class="legend-py">chéng shì shè jì</span></div><div class="legend-en">Coding</div></div></div>
+    <div class="legend-item"><span class="legend-emoji">📖</span><div><div class="legend-zh">中文閱讀 <span class="legend-py">zhōng wén yuè dú</span></div><div class="legend-en">Chinese Reading</div></div></div>
+    <div class="legend-item"><span class="legend-emoji">🎻</span><div><div class="legend-zh">小提琴 <span class="legend-py">xiǎo tí qín</span></div><div class="legend-en">Violin</div></div></div>
+    <div class="legend-item"><span class="legend-emoji">📰</span><div><div class="legend-zh">科普閱讀 <span class="legend-py">kē pǔ yuè dú</span></div><div class="legend-en">Nonfiction Reading</div></div></div>
+    <div class="legend-item"><span class="legend-emoji">📕</span><div><div class="legend-zh">故事閱讀 <span class="legend-py">gù shì yuè dú</span></div><div class="legend-en">Fiction Reading</div></div></div>
+  </div>
+</div>
 
 <!-- CHINESE RESOURCES PANEL -->
 <div class="ixl-dd-backdrop" id="zh-dd-backdrop" onclick="closeZhDropdown()"></div>
