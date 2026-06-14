@@ -520,6 +520,7 @@ body { font-family: 'Nunito', system-ui, sans-serif; background: #FFF8EE; min-he
   <div class="hdr-left">
     <div class="hdr-title">⭐ 愛的暑假 2026 ⭐<br>Evelyn's Summer 2026</div>
     <div class="hdr-sub">6月15日 – 7月29日 · Jun 15 – Jul 29</div>
+    <div id="hdr-gems" style="margin-top:6px;font-size:16px;font-weight:900;opacity:0.95;letter-spacing:0.02em"></div>
   </div>
   <div class="today-chip">
     <div class="chip-date" id="chip-date">—</div>
@@ -1242,6 +1243,8 @@ function renderHeader(){
   const todayInfo=getTodayInfo();
   const chipDate=document.getElementById("chip-date");
   const chipProg=document.getElementById("chip-prog");
+  const hdrGems=document.getElementById("hdr-gems");
+  if(hdrGems){ const g=getTotalGems(); hdrGems.textContent=g>0?`💎 ${g} gems earned`:''; }
   if(todayInfo){
     const {wi,di,day}=todayInfo;
     chipDate.textContent=day.date;
