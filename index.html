@@ -1683,7 +1683,7 @@ function renderWeekView(){
         html+=`<div class="task" onclick="toggleCustom('${ct.id}')">
           <div class="cb${done?' on':''}"><span class="cb-mark">✓</span></div>
           <div class="t-info">
-            <div class="t-en${done?' done':''}" style="color:${done?'#ccc':'#6C5CE7'};font-style:italic">${ct.text}</div>
+            <div class="t-en${done?' done':''}" style="color:${done?'#ccc':'#6C5CE7'}">${ct.text}</div>
           </div>
           <span onclick="(function(e){e.stopPropagation();deleteCustomTask('${ct.id}');})(event)" style="color:#ccc;font-size:14px;cursor:pointer;padding:2px 4px">✕</span>
         </div>`;
