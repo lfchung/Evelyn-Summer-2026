@@ -689,6 +689,43 @@ const IXL_ALL = [
 // Flat list for easy lookup
 const IXL_FLAT = IXL_ALL.flatMap(d => d.skills);
 
+// ── MATH DAILY SCHEDULE ──
+const MATH_IXL_IDS = ["m01a","m01b","m01c","m01d","m02a","m02b","m03a","m03b","m03c","m04a","m04b","m04c"];
+const IXL_READ_IDS = ["r01a","r02a","r02b","r03a","r03b"];
+
+// Assign one math skill per weekday (Mon/Wed/Fri) in order; Sat = kangaroo; after 12 skills = free
+const MATH_SCHEDULE = (()=>{
+  const s={}; let idx=0;
+  WEEKS.forEach(wk=>wk.days.forEach(day=>{
+    if(!(day.tasks||[]).includes('math')) return;
+    s[day.date] = day.dow==='Sat' ? 'kangaroo'
+      : idx < MATH_IXL_IDS.length ? MATH_IXL_IDS[idx++] : 'free';
+  }));
+  return s;
+})();
+
+function getDayMathMode(day){
+  const m=MATH_SCHEDULE[day.date];
+  if(!m||m==='free') return {mode:'free'};
+  if(m==='kangaroo') return {mode:'kangaroo'};
+  return {mode:'skill', skill:IXL_FLAT.find(s=>s.id===m), skillId:m};
+}
+
+// Effective task list — adds ixl_reading on Tue/Thu/Sat
+function getEffectiveTasks(day){
+  if(!day.tasks) return [];
+  const tasks=[...day.tasks];
+  if(!day.free&&!day.makeup&&['Tue','Thu','Sat'].includes(day.dow)&&tasks.length>0)
+    if(!tasks.includes('ixl_reading')) tasks.push('ixl_reading');
+  return tasks;
+}
+
+// ixl_reading counts as done when all reading skills completed (or manually checked)
+function isTaskEffDone(wi,di,t){
+  if(t==='ixl_reading') return IXL_READ_IDS.every(id=>!!S[`ixl_${id}`]) || isDone(wi,di,t);
+  return isDone(wi,di,t);
+}
+
 // ── WEEKS (violin now Thu + Sat = 2x/week) ──
 const WEEKS = [
   { label:"第1週", dates:"Jun 15–21", days:[
@@ -751,35 +788,6 @@ const WEEKS = [
     {dow:"Wed",date:"Jul 29",tasks:["piano","math","chinese","nonfiction","reading"]},
   ]},
 ];
-
-// ── MATH DAILY SCHEDULE (must be after WEEKS) ──
-const MATH_IXL_IDS = ["m01a","m01b","m01c","m01d","m02a","m02b","m03a","m03b","m03c","m04a","m04b","m04c"];
-const IXL_READ_IDS = ["r01a","r02a","r02b","r03a","r03b"];
-
-const MATH_SCHEDULE = (()=>{
-  const s={}; let idx=0;
-  WEEKS.forEach(wk=>wk.days.forEach(day=>{
-    if(!(day.tasks||[]).includes('math')) return;
-    s[day.date] = day.dow==='Sat' ? 'kangaroo'
-      : idx < MATH_IXL_IDS.length ? MATH_IXL_IDS[idx++] : 'free';
-  }));
-  return s;
-})();
-
-function getDayMathMode(day){
-  const m=MATH_SCHEDULE[day.date];
-  if(!m||m==='free') return {mode:'free'};
-  if(m==='kangaroo') return {mode:'kangaroo'};
-  return {mode:'skill', skill:IXL_FLAT.find(s=>s.id===m), skillId:m};
-}
-
-function getEffectiveTasks(day){
-  if(!day.tasks) return [];
-  const tasks=[...day.tasks];
-  if(!day.free&&!day.makeup&&['Tue','Thu','Sat'].includes(day.dow)&&tasks.length>0)
-    if(!tasks.includes('ixl_reading')) tasks.push('ixl_reading');
-  return tasks;
-}
 
 // ── STATE ──
 const SK = "evelyn_s26_v4";
