@@ -850,6 +850,11 @@ function isToday(dateStr) {
   const d = parseDate(dateStr), n = new Date();
   return d.getFullYear()===n.getFullYear() && d.getMonth()===n.getMonth() && d.getDate()===n.getDate();
 }
+function isPastDay(dateStr) {
+  const d = parseDate(dateStr), n = new Date();
+  n.setHours(0,0,0,0);
+  return d < n;
+}
 function getCurrentWeekIdx() {
   const now = new Date();
   const ranges = [
@@ -1492,10 +1497,12 @@ function renderDayDetail(wi, di){
       });
     }
 
+    const pastDay=isPastDay(day.date);
     (day.tasks||[]).forEach(t=>{
       const checked=isDone(wi,di,t);
       const postponed=isPostponed(wi,di,t);
       const def=T[t];
+      const frozenDone = pastDay && checked;
       const canPostpone=!checked && !postponed && !!nextDay(wi,di);
       const pBtn=canPostpone ? `<button class="postpone-btn" onclick="postponeTask(${wi},${di},'${t}',event)">→ 明天</button>` : '';
       const pBadge=postponed ? `<span class="postponed-badge">→ 明天</span>` : '';
@@ -1504,39 +1511,40 @@ function renderDayDetail(wi, di){
         const skillLabel=sk ? sk.title : '🎉 All done — free IXL!';
         const skillCode=sk ? `<span style="font-family:monospace;font-size:12px;font-weight:900;color:#7AAAE0;background:#EEF4FF;padding:2px 6px;border-radius:6px">${sk.code}</span>` : '';
         const doneCount=IXL_FLAT.filter(s=>!!S[`ixl_${s.id}`]).length;
-        html+=`<div class="big-task${checked||postponed?" done-task":""}" data-task="math" onclick="toggle(${wi},${di},'math',event)">
-          <div class="big-cb${checked?" on":""}" onclick="event.stopPropagation();toggle(${wi},${di},'math',event)"><span class="big-cb-mark">✓</span></div>
+        html+=`<div class="big-task${checked||postponed?" done-task":""}" data-task="math" ${frozenDone?"":`onclick="toggle(${wi},${di},'math',event)"`}>
+          <div class="big-cb${checked?" on":""}" ${frozenDone?"":` onclick="event.stopPropagation();toggle(${wi},${di},'math',event)"`}><span class="big-cb-mark">✓</span></div>
           <div class="big-t-info">
             <div class="big-t-en${checked||postponed?" done":""}" style="color:${checked||postponed?"#ccc":def.color}">${def.emoji} ${def.zh}</div>
             <div class="big-t-zh${checked?" done":""}" style="font-size:13px">${skillLabel} <span class="big-t-min">${def.min}</span></div>
           </div>
           <div style="text-align:right;flex-shrink:0;display:flex;flex-direction:column;align-items:flex-end;gap:4px">
-            ${pBadge}${pBtn}
+            ${pBadge}${frozenDone?"":pBtn}
             ${skillCode}
             <div style="font-size:11px;color:#aaa">${doneCount}/${IXL_FLAT.length} ✓</div>
           </div>
         </div>`;
       } else if(t==="chinese" && !locked){
-        html+=`<div class="big-task${checked||postponed?" done-task":""}" data-task="chinese" onclick="toggle(${wi},${di},'chinese',event)">
-          <div class="big-cb${checked?" on":""}" onclick="event.stopPropagation();toggle(${wi},${di},'chinese',event)"><span class="big-cb-mark">✓</span></div>
+        html+=`<div class="big-task${checked||postponed?" done-task":""}" data-task="chinese" ${frozenDone?"":`onclick="toggle(${wi},${di},'chinese',event)"`}>
+          <div class="big-cb${checked?" on":""}" ${frozenDone?"":` onclick="event.stopPropagation();toggle(${wi},${di},'chinese',event)"`}><span class="big-cb-mark">✓</span></div>
           <div class="big-t-info">
             <div class="big-t-en${checked||postponed?" done":""}" style="color:${checked||postponed?"#ccc":def.color}">${def.emoji} ${def.zh}</div>
             <div class="big-t-zh${checked?" done":""}">${def.en} <span class="big-t-min">${def.min}</span></div>
           </div>
           <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0">
-            ${pBadge}${pBtn}
-            <button class="postpone-btn" style="background:#FFF3E8;color:#e67e22;border-color:#e67e22" onclick="event.stopPropagation();openZhDropdown(event)">▶ 影片</button>
+            ${pBadge}${frozenDone?"":pBtn}
+            ${frozenDone?"":`<button class="postpone-btn" style="background:#FFF3E8;color:#e67e22;border-color:#e67e22" onclick="event.stopPropagation();openZhDropdown(event)">▶ 影片</button>`}
           </div>
         </div>`;
       } else {
         const dispMin = (t==='reading' && hasNonfiction) ? '15分' : def.min;
-        html+=`<div class="big-task${checked||postponed?" done-task":""}${locked?" locked-task":""}" data-task="${t}" onclick="${locked?"":"toggle("+wi+","+di+",'"+t+"',event)"}">
+        const clickHandler = frozenDone ? "" : locked ? "" : `onclick="toggle(${wi},${di},'${t}',event)"`;
+        html+=`<div class="big-task${checked||postponed?" done-task":""}${locked?" locked-task":""}" data-task="${t}" ${clickHandler}>
           <div class="big-cb${checked?" on":""}"><span class="big-cb-mark">✓</span></div>
           <div class="big-t-info">
             <div class="big-t-en${checked||postponed?" done":""}" style="color:${checked||postponed?"#ccc":def.color}">${def.emoji} ${def.zh}</div>
             <div class="big-t-zh${checked?" done":""}">${def.en} <span class="big-t-min">${dispMin}</span></div>
           </div>
-          ${pBadge}${pBtn}
+          ${pBadge}${frozenDone?"":pBtn}
         </div>`;
       }
     });
@@ -1651,12 +1659,16 @@ function renderWeekView(){
           </div>`;
         });
       }
+      const pastDay=isPastDay(d.date);
       (d.tasks||[]).forEach(t=>{
         const checked=isDone(wi,di,t);
         const postponed=isPostponed(wi,di,t);
         const def=T[t];
+        const frozenDone = pastDay && checked;
         let handler, rightSide='';
-        if(!locked && t==="math"){
+        if(frozenDone){
+          handler='';
+        } else if(!locked && t==="math"){
           const sk=getDayIxlSkill(d);
           handler=`onclick="toggle(${wi},${di},'math',event)"`;
           rightSide=sk ? `<span style="font-size:10px;font-weight:900;color:#7AAAE0;flex-shrink:0;font-family:monospace">${sk.code}</span>` : '';
@@ -1668,8 +1680,8 @@ function renderWeekView(){
         }
         if(postponed) rightSide=`<span class="postponed-badge">→</span>`;
         const dispMin = (t==='reading' && (d.tasks||[]).includes('nonfiction')) ? '15分' : def.min;
-        const cbHandler=(!locked&&t==="chinese")?`onclick="event.stopPropagation();toggle(${wi},${di},'${t}',event)"`:"";
-        html+=`<div class="task${locked?" locked-task":""}" ${handler}>
+        const cbHandler=(!locked&&!frozenDone&&t==="chinese")?`onclick="event.stopPropagation();toggle(${wi},${di},'${t}',event)"`:"";
+        html+=`<div class="task${locked?" locked-task":""}${frozenDone?" locked-task":""}" ${handler}>
           <div class="cb${checked?" on":""}" ${cbHandler}><span class="cb-mark">✓</span></div>
           <div class="t-info">
             <div class="t-en${checked||postponed?" done":""}" style="color:${checked||postponed?"#ccc":def.color}">${def.emoji} ${def.zh} <span class="t-min">${dispMin}</span></div>
