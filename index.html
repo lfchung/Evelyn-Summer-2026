@@ -668,7 +668,7 @@ const T = {
   freemath:  { en:"Math",       zh:"數學練習",    min:"20分", color:"#0984e3", emoji:"🔢" },
   coding:    { en:"Coding",     zh:"程式設計",  min:"30分", color:"#00a651", emoji:"💻" },
   chinese:   { en:"Chinese",    zh:"中文閱讀",  min:"15分", color:"#e67e22", emoji:"📖" },
-  violin:    { en:"Violin",     zh:"小提琴",   min:"20分", color:"#d4a017", emoji:"🎻" },
+  violin:    { en:"Violin",     zh:"小提琴",   min:"20分", color:"#d4a017", emoji:"🎻", note:"use Trala" },
   reading:   { en:"Fiction",    zh:"故事閱讀",  min:"20分", color:"#a29bfe", emoji:"📕" },
   nonfiction:{ en:"Nonfiction", zh:"科普閱讀",  min:"15分", color:"#00cec9", emoji:"📰" },
 };
@@ -1191,19 +1191,29 @@ const MONTH_PARSE = {
   aug:'Aug',august:'Aug',sep:'Sep',september:'Sep',oct:'Oct',october:'Oct',
   nov:'Nov',november:'Nov',dec:'Dec',december:'Dec'
 };
+const NUM_TO_MON = ['','Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 function parseTaskInput(raw){
-  // Match "month day" or "day month" patterns
-  const re=/\b(jan(?:uary)?|feb(?:ruary)?|mar(?:ch)?|apr(?:il)?|may|jun(?:e)?|jul(?:y)?|aug(?:ust)?|sep(?:tember)?|oct(?:ober)?|nov(?:ember)?|dec(?:ember)?)\s+(\d{1,2})\b/i;
-  const m=raw.match(re);
-  if(!m) return null;
-  const mon=MONTH_PARSE[m[1].toLowerCase()];
-  const day=parseInt(m[2]);
-  const date=`${mon} ${day}`;
-  // Check date exists in WEEKS
+  let date=null, matchStr='';
+
+  // Try "month day" — e.g. "june 15", "Jul 3"
+  const reWord=/\b(jan(?:uary)?|feb(?:ruary)?|mar(?:ch)?|apr(?:il)?|may|jun(?:e)?|jul(?:y)?|aug(?:ust)?|sep(?:tember)?|oct(?:ober)?|nov(?:ember)?|dec(?:ember)?)\s+(\d{1,2})\b/i;
+  const mw=raw.match(reWord);
+  if(mw){ date=`${MONTH_PARSE[mw[1].toLowerCase()]} ${parseInt(mw[2])}`; matchStr=mw[0]; }
+
+  // Try numeric — e.g. "6/15", "6-15", "06/15"
+  if(!date){
+    const reNum=/\b(\d{1,2})[\/\-](\d{1,2})\b/;
+    const mn=raw.match(reNum);
+    if(mn){
+      const mon=parseInt(mn[1]), day=parseInt(mn[2]);
+      if(mon>=1&&mon<=12&&day>=1&&day<=31){ date=`${NUM_TO_MON[mon]} ${day}`; matchStr=mn[0]; }
+    }
+  }
+
+  if(!date) return null;
   const found=WEEKS.flatMap(w=>w.days).find(d=>d.date===date);
   if(!found) return {error:`${date} isn't in the schedule`};
-  // Strip date + surrounding filler words from text
-  let text=raw.replace(re,'').replace(/\bfor\b|\bon\b/gi,'').replace(/\s+/g,' ').trim();
+  let text=raw.replace(matchStr,'').replace(/\bfor\b|\bon\b/gi,'').replace(/\s+/g,' ').trim();
   if(!text) text=raw.trim();
   return {date, text};
 }
@@ -1542,7 +1552,8 @@ function renderDayDetail(wi, di){
           <div class="big-cb${checked?" on":""}"><span class="big-cb-mark">✓</span></div>
           <div class="big-t-info">
             <div class="big-t-en${checked||postponed?" done":""}" style="color:${checked||postponed?"#ccc":def.color}">${def.emoji} ${def.zh}</div>
-            <div class="big-t-zh${checked?" done":""}">${def.en} <span class="big-t-min">${dispMin}</span></div>
+            <div class="big-t-zh${checked?" done":""}">${def.en} <span class="big-t-min">${dispMin}</span>${def.note?` <span style="font-size:11px;color:#aaa;font-weight:600">· ${def.note}</span>`:''}
+            </div>
           </div>
           ${pBadge}${frozenDone?"":pBtn}
         </div>`;
