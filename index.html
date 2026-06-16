@@ -625,7 +625,7 @@ body { font-family: 'Nunito', system-ui, sans-serif; background: #FFF8EE; min-he
   <div style="padding:14px 16px 18px;display:flex;flex-direction:column;gap:10px">
     <textarea id="addtask-input" rows="2"
       style="width:100%;box-sizing:border-box;border:2px solid #ddd;border-radius:12px;padding:10px 12px;font-size:16px;font-family:inherit;resize:none;outline:none"
-      placeholder="count allowance jun 15"
+      placeholder=""
       onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();submitAddTask()}"
     ></textarea>
     <div id="addtask-error" style="color:#e17055;font-size:13px;font-weight:700;display:none"></div>
@@ -1404,6 +1404,20 @@ function renderDayDetail(wi, di){
       });
       html+=`</div></div>`;
     }
+    // Custom tasks on makeup day
+    const makeupCustom=getCustomTasks(day.date);
+    if(makeupCustom.length>0){
+      html+=`<div style="margin-top:10px;display:flex;flex-direction:column;gap:8px">`;
+      makeupCustom.forEach(ct=>{
+        const done=!!S[ct.id];
+        html+=`<div class="big-task${done?' done-task':''}" style="border-style:dashed" onclick="toggleCustom('${ct.id}')">
+          <div class="big-cb${done?' on':''}" onclick="event.stopPropagation();toggleCustom('${ct.id}')"><span class="big-cb-mark">✓</span></div>
+          <div class="big-t-info"><div class="big-t-en${done?' done':''}" style="color:${done?'#ccc':'#6C5CE7'}">${ct.text}</div></div>
+          <button onclick="event.stopPropagation();deleteCustomTask('${ct.id}')" style="background:none;border:none;color:#ccc;font-size:16px;cursor:pointer;padding:4px 6px;flex-shrink:0">✕</button>
+        </div>`;
+      });
+      html+=`</div>`;
+    }
     el.innerHTML=html;
     return;
   }
@@ -1416,6 +1430,20 @@ function renderDayDetail(wi, di){
       <div class="free-today-zh">自由日！今天完全休息</div>
       <div class="free-today-en">Free Day! Total rest today 🎈</div>
     </div>`;
+    // Custom tasks on free days
+    const freeCustom=getCustomTasks(day.date);
+    if(freeCustom.length>0){
+      html+=`<div style="margin-top:10px;display:flex;flex-direction:column;gap:8px">`;
+      freeCustom.forEach(ct=>{
+        const done=!!S[ct.id];
+        html+=`<div class="big-task${done?' done-task':''}" style="border-style:dashed" onclick="toggleCustom('${ct.id}')">
+          <div class="big-cb${done?' on':''}" onclick="event.stopPropagation();toggleCustom('${ct.id}')"><span class="big-cb-mark">✓</span></div>
+          <div class="big-t-info"><div class="big-t-en${done?' done':''}" style="color:${done?'#ccc':'#6C5CE7'}">${ct.text}</div></div>
+          <button onclick="event.stopPropagation();deleteCustomTask('${ct.id}')" style="background:none;border:none;color:#ccc;font-size:16px;cursor:pointer;padding:4px 6px;flex-shrink:0">✕</button>
+        </div>`;
+      });
+      html+=`</div>`;
+    }
   } else {
     html+=`<div class="big-tasks">`;
 
