@@ -629,7 +629,8 @@ body { font-family: 'Nunito', system-ui, sans-serif; background: #FFF8EE; min-he
 // ── TASK DEFINITIONS ──
 const T = {
   piano:     { en:"Piano",      zh:"鋼琴",      min:"20分", color:"#6C5CE7", emoji:"🎹" },
-  math:      { en:"IXL",        zh:"IXL 夏日探險", min:"30分", color:"#0984e3", emoji:"📚" },
+  math:      { en:"IXL",        zh:"IXL 夏日探險", min:"20分", color:"#0984e3", emoji:"📚" },
+  freemath:  { en:"Math",       zh:"數學練習",    min:"20分", color:"#0984e3", emoji:"🔢" },
   coding:    { en:"Coding",     zh:"程式設計",  min:"30分", color:"#00a651", emoji:"💻" },
   chinese:   { en:"Chinese",    zh:"中文閱讀",  min:"15分", color:"#e67e22", emoji:"📖" },
   violin:    { en:"Violin",     zh:"小提琴",   min:"20分", color:"#d4a017", emoji:"🎻" },
@@ -676,68 +677,86 @@ const IXL_ALL = [
 // Flat list for easy lookup
 const IXL_FLAT = IXL_ALL.flatMap(d => d.skills);
 
-// ── WEEKS (violin now Thu + Sat = 2x/week) ──
+// ── WEEKS ──
+// math = IXL (1 skill/day, 20 min, Tue/Thu/Sat)
+// freemath = 20 min math practice (Mon/Wed/Fri/Sat)
 const WEEKS = [
   { label:"第1週", dates:"Jun 15–21", days:[
-    {dow:"Mon",date:"Jun 15",camp:"swim",campTime:"9–12p",tasks:["piano","math","chinese","nonfiction","reading"]},
-    {dow:"Tue",date:"Jun 16",camp:"swim",campTime:"9–12p",lesson:true,tasks:["coding","chinese","reading"]},
-    {dow:"Wed",date:"Jun 17",camp:"swim",campTime:"9–12p",tasks:["piano","math","chinese","nonfiction","reading"]},
-    {dow:"Thu",date:"Jun 18",camp:"swim",campTime:"9–12p",tasks:["coding","chinese","violin","reading"]},
-    {dow:"Fri",date:"Jun 19",camp:"swim",campTime:"9–12p",tasks:["piano","math","chinese","nonfiction","reading"]},
-    {dow:"Sat",date:"Jun 20",tasks:["violin","math","chinese","reading"]},
+    {dow:"Mon",date:"Jun 15",camp:"swim",campTime:"9–12p",tasks:["piano","freemath","chinese","nonfiction","reading"]},
+    {dow:"Tue",date:"Jun 16",camp:"swim",campTime:"9–12p",lesson:true,tasks:["coding","math","chinese","reading"]},
+    {dow:"Wed",date:"Jun 17",camp:"swim",campTime:"9–12p",tasks:["piano","freemath","chinese","nonfiction","reading"]},
+    {dow:"Thu",date:"Jun 18",camp:"swim",campTime:"9–12p",tasks:["coding","math","chinese","violin","reading"]},
+    {dow:"Fri",date:"Jun 19",camp:"swim",campTime:"9–12p",tasks:["piano","freemath","chinese","nonfiction","reading"]},
+    {dow:"Sat",date:"Jun 20",tasks:["violin","math","freemath","chinese","reading"]},
     {dow:"Sun",date:"Jun 21",makeup:true},
   ]},
   { label:"第2週", dates:"Jun 22–28", days:[
-    {dow:"Mon",date:"Jun 22",tasks:["piano","math","chinese","nonfiction","reading"]},
-    {dow:"Tue",date:"Jun 23",lesson:true,tasks:["coding","chinese","reading"]},
-    {dow:"Wed",date:"Jun 24",tasks:["piano","math","chinese","nonfiction","reading"]},
-    {dow:"Thu",date:"Jun 25",tasks:["coding","chinese","violin","reading"]},
-    {dow:"Fri",date:"Jun 26",tasks:["piano","math","chinese","nonfiction","reading"]},
-    {dow:"Sat",date:"Jun 27",tasks:["violin","math","chinese","reading"]},
+    {dow:"Mon",date:"Jun 22",tasks:["piano","freemath","chinese","nonfiction","reading"]},
+    {dow:"Tue",date:"Jun 23",lesson:true,tasks:["coding","math","chinese","reading"]},
+    {dow:"Wed",date:"Jun 24",tasks:["piano","freemath","chinese","nonfiction","reading"]},
+    {dow:"Thu",date:"Jun 25",tasks:["coding","math","chinese","violin","reading"]},
+    {dow:"Fri",date:"Jun 26",tasks:["piano","freemath","chinese","nonfiction","reading"]},
+    {dow:"Sat",date:"Jun 27",tasks:["violin","math","freemath","chinese","reading"]},
     {dow:"Sun",date:"Jun 28",makeup:true},
   ]},
   { label:"第3週", dates:"Jun 29–Jul 5", days:[
-    {dow:"Mon",date:"Jun 29",tasks:["piano","math","chinese","nonfiction","reading"]},
-    {dow:"Tue",date:"Jun 30",lesson:true,tasks:["coding","chinese","reading"]},
-    {dow:"Wed",date:"Jul 1",tasks:["piano","math","chinese","nonfiction","reading"]},
-    {dow:"Thu",date:"Jul 2",tasks:["coding","chinese","violin","reading"]},
-    {dow:"Fri",date:"Jul 3",tasks:["piano","math","chinese","nonfiction","reading"]},
-    {dow:"Sat",date:"Jul 4",holiday:true,tasks:["violin","math","chinese","reading"]},
+    {dow:"Mon",date:"Jun 29",tasks:["piano","freemath","chinese","nonfiction","reading"]},
+    {dow:"Tue",date:"Jun 30",lesson:true,tasks:["coding","math","chinese","reading"]},
+    {dow:"Wed",date:"Jul 1",tasks:["piano","freemath","chinese","nonfiction","reading"]},
+    {dow:"Thu",date:"Jul 2",tasks:["coding","math","chinese","violin","reading"]},
+    {dow:"Fri",date:"Jul 3",tasks:["piano","freemath","chinese","nonfiction","reading"]},
+    {dow:"Sat",date:"Jul 4",holiday:true,tasks:["violin","math","freemath","chinese","reading"]},
     {dow:"Sun",date:"Jul 5",makeup:true},
   ]},
   { label:"第4週", dates:"Jul 6–12", days:[
-    {dow:"Mon",date:"Jul 6",tasks:["piano","math","chinese","nonfiction","reading"]},
-    {dow:"Tue",date:"Jul 7",lesson:true,tasks:["coding","chinese","reading"]},
-    {dow:"Wed",date:"Jul 8",tasks:["piano","math","chinese","nonfiction","reading"]},
-    {dow:"Thu",date:"Jul 9",tasks:["coding","chinese","violin","reading"]},
-    {dow:"Fri",date:"Jul 10",tasks:["piano","math","chinese","nonfiction","reading"]},
-    {dow:"Sat",date:"Jul 11",tasks:["violin","math","chinese","reading"]},
+    {dow:"Mon",date:"Jul 6",tasks:["piano","freemath","chinese","nonfiction","reading"]},
+    {dow:"Tue",date:"Jul 7",lesson:true,tasks:["coding","math","chinese","reading"]},
+    {dow:"Wed",date:"Jul 8",tasks:["piano","freemath","chinese","nonfiction","reading"]},
+    {dow:"Thu",date:"Jul 9",tasks:["coding","math","chinese","violin","reading"]},
+    {dow:"Fri",date:"Jul 10",tasks:["piano","freemath","chinese","nonfiction","reading"]},
+    {dow:"Sat",date:"Jul 11",tasks:["violin","math","freemath","chinese","reading"]},
     {dow:"Sun",date:"Jul 12",makeup:true},
   ]},
   { label:"第5週", dates:"Jul 13–19", days:[
-    {dow:"Mon",date:"Jul 13",tasks:["piano","math","chinese","nonfiction","reading"]},
-    {dow:"Tue",date:"Jul 14",lesson:true,tasks:["coding","chinese","reading"]},
-    {dow:"Wed",date:"Jul 15",tasks:["piano","math","chinese","nonfiction","reading"]},
-    {dow:"Thu",date:"Jul 16",tasks:["coding","chinese","violin","reading"]},
-    {dow:"Fri",date:"Jul 17",tasks:["piano","math","chinese","nonfiction","reading"]},
-    {dow:"Sat",date:"Jul 18",tasks:["violin","math","chinese","reading"]},
+    {dow:"Mon",date:"Jul 13",tasks:["piano","freemath","chinese","nonfiction","reading"]},
+    {dow:"Tue",date:"Jul 14",lesson:true,tasks:["coding","math","chinese","reading"]},
+    {dow:"Wed",date:"Jul 15",tasks:["piano","freemath","chinese","nonfiction","reading"]},
+    {dow:"Thu",date:"Jul 16",tasks:["coding","math","chinese","violin","reading"]},
+    {dow:"Fri",date:"Jul 17",tasks:["piano","freemath","chinese","nonfiction","reading"]},
+    {dow:"Sat",date:"Jul 18",tasks:["violin","math","freemath","chinese","reading"]},
     {dow:"Sun",date:"Jul 19",makeup:true},
   ]},
   { label:"第6週", dates:"Jul 20–26", days:[
-    {dow:"Mon",date:"Jul 20",camp:"tennis",campTime:"9–12p",tasks:["piano","math","chinese","nonfiction","reading"]},
-    {dow:"Tue",date:"Jul 21",camp:"tennis",campTime:"9–12p",lesson:true,tasks:["coding","chinese","reading"]},
-    {dow:"Wed",date:"Jul 22",camp:"tennis",campTime:"9–12p",tasks:["piano","math","chinese","nonfiction","reading"]},
-    {dow:"Thu",date:"Jul 23",camp:"tennis",campTime:"9–12p",tasks:["coding","chinese","violin","reading"]},
-    {dow:"Fri",date:"Jul 24",camp:"tennis",campTime:"9–12p",tasks:["piano","math","chinese","nonfiction","reading"]},
-    {dow:"Sat",date:"Jul 25",tasks:["violin","math","chinese","reading"]},
+    {dow:"Mon",date:"Jul 20",camp:"tennis",campTime:"9–12p",tasks:["piano","freemath","chinese","nonfiction","reading"]},
+    {dow:"Tue",date:"Jul 21",camp:"tennis",campTime:"9–12p",lesson:true,tasks:["coding","math","chinese","reading"]},
+    {dow:"Wed",date:"Jul 22",camp:"tennis",campTime:"9–12p",tasks:["piano","freemath","chinese","nonfiction","reading"]},
+    {dow:"Thu",date:"Jul 23",camp:"tennis",campTime:"9–12p",tasks:["coding","math","chinese","violin","reading"]},
+    {dow:"Fri",date:"Jul 24",camp:"tennis",campTime:"9–12p",tasks:["piano","freemath","chinese","nonfiction","reading"]},
+    {dow:"Sat",date:"Jul 25",tasks:["violin","math","freemath","chinese","reading"]},
     {dow:"Sun",date:"Jul 26",makeup:true},
   ]},
   { label:"第7週", dates:"Jul 27–29", days:[
-    {dow:"Mon",date:"Jul 27",tasks:["piano","math","chinese","nonfiction","reading"]},
-    {dow:"Tue",date:"Jul 28",lesson:true,tasks:["coding","chinese","reading"]},
-    {dow:"Wed",date:"Jul 29",tasks:["piano","math","chinese","nonfiction","reading"]},
+    {dow:"Mon",date:"Jul 27",tasks:["piano","freemath","chinese","nonfiction","reading"]},
+    {dow:"Tue",date:"Jul 28",lesson:true,tasks:["coding","math","chinese","reading"]},
+    {dow:"Wed",date:"Jul 29",tasks:["piano","freemath","chinese","nonfiction","reading"]},
   ]},
 ];
+
+// ── IXL DAILY SCHEDULE (must be after WEEKS) ──
+// Assign 1 skill per math day in order; after all 17 done → "free choice"
+const MATH_SCHEDULE = (()=>{
+  const s={}; let idx=0;
+  WEEKS.forEach(wk=>wk.days.forEach(day=>{
+    if(!(day.tasks||[]).includes('math')) return;
+    s[day.date] = idx < IXL_FLAT.length ? IXL_FLAT[idx++].id : 'free';
+  }));
+  return s;
+})();
+function getDayIxlSkill(day){
+  const id=MATH_SCHEDULE[day.date];
+  if(!id||id==='free') return null;
+  return IXL_FLAT.find(s=>s.id===id)||null;
+}
 
 // ── STATE ──
 const SK = "evelyn_s26_v4";
@@ -1348,17 +1367,20 @@ function renderDayDetail(wi, di){
       const pBtn=canPostpone ? `<button class="postpone-btn" onclick="postponeTask(${wi},${di},'${t}',event)">→ 明天</button>` : '';
       const pBadge=postponed ? `<span class="postponed-badge">→ 明天</span>` : '';
       if(t==="math" && !locked){
-        const catDone=getIxlCatDone();
-        html+=`<div class="big-task${checked||postponed?" done-task":""}" data-task="math" onclick="openIxlDropdown(event)">
+        const sk=getDayIxlSkill(day);
+        const skillLabel=sk ? sk.title : '🎉 All done — free IXL!';
+        const skillCode=sk ? `<span style="font-family:monospace;font-size:12px;font-weight:900;color:#7AAAE0;background:#EEF4FF;padding:2px 6px;border-radius:6px">${sk.code}</span>` : '';
+        const doneCount=IXL_FLAT.filter(s=>!!S[`ixl_${s.id}`]).length;
+        html+=`<div class="big-task${checked||postponed?" done-task":""}" data-task="math" onclick="toggle(${wi},${di},'math',event)">
           <div class="big-cb${checked?" on":""}" onclick="event.stopPropagation();toggle(${wi},${di},'math',event)"><span class="big-cb-mark">✓</span></div>
           <div class="big-t-info">
             <div class="big-t-en${checked||postponed?" done":""}" style="color:${checked||postponed?"#ccc":def.color}">${def.emoji} ${def.zh}</div>
-            <div class="big-t-zh${checked?" done":""}">${def.en} <span class="big-t-min">${def.min}</span></div>
+            <div class="big-t-zh${checked?" done":""}" style="font-size:13px">${skillLabel} <span class="big-t-min">${def.min}</span></div>
           </div>
           <div style="text-align:right;flex-shrink:0;display:flex;flex-direction:column;align-items:flex-end;gap:4px">
             ${pBadge}${pBtn}
-            <div style="font-size:12px;font-weight:800;color:#7AAAE0">${catDone}/${IXL_CATS} ▾</div>
-            <div style="font-size:11px;font-weight:800;color:#FD79A8">~1 per week 🎯</div>
+            ${skillCode}
+            <div style="font-size:11px;color:#aaa">${doneCount}/${IXL_FLAT.length} ✓</div>
           </div>
         </div>`;
       } else if(t==="chinese" && !locked){
@@ -1465,8 +1487,7 @@ function renderWeekView(){
           if(!isPostponed(prevD.wi,prevD.di,t)) return;
           const checked=isDone(prevD.wi,prevD.di,t);
           const def=T[t];
-          const handler=t==="math"?"onclick=\"openIxlDropdown(event)\""
-                        :t==="chinese"?"onclick=\"openZhDropdown(event)\""
+          const handler=t==="chinese"?"onclick=\"openZhDropdown(event)\""
                         :`onclick="toggle(${prevD.wi},${prevD.di},'${t}',event)"`;
           html+=`<div class="task" ${handler}>
             <div class="cb${checked?" on":""}" onclick="event.stopPropagation();toggle(${prevD.wi},${prevD.di},'${t}',event)"><span class="cb-mark">✓</span></div>
@@ -1483,9 +1504,9 @@ function renderWeekView(){
         const def=T[t];
         let handler, rightSide='';
         if(!locked && t==="math"){
-          const cnt=getIxlCount();
-          handler=`onclick="openIxlDropdown(event)"`;
-          rightSide=`<span style="font-size:10px;font-weight:800;color:#7AAAE0;flex-shrink:0">${getIxlCatDone()}/${IXL_CATS}</span>`;
+          const sk=getDayIxlSkill(d);
+          handler=`onclick="toggle(${wi},${di},'math',event)"`;
+          rightSide=sk ? `<span style="font-size:10px;font-weight:900;color:#7AAAE0;flex-shrink:0;font-family:monospace">${sk.code}</span>` : '';
         } else if(!locked && t==="chinese"){
           handler=`onclick="openZhDropdown(event)"`;
           rightSide=`<span style="font-size:11px;font-weight:800;color:#e67e22;flex-shrink:0">▶</span>`;
@@ -1494,7 +1515,7 @@ function renderWeekView(){
         }
         if(postponed) rightSide=`<span class="postponed-badge">→</span>`;
         const dispMin = (t==='reading' && (d.tasks||[]).includes('nonfiction')) ? '15分' : def.min;
-        const cbHandler=(!locked&&(t==="math"||t==="chinese"))?`onclick="event.stopPropagation();toggle(${wi},${di},'${t}',event)"`:"";
+        const cbHandler=(!locked&&t==="chinese")?`onclick="event.stopPropagation();toggle(${wi},${di},'${t}',event)"`:"";
         html+=`<div class="task${locked?" locked-task":""}" ${handler}>
           <div class="cb${checked?" on":""}" ${cbHandler}><span class="cb-mark">✓</span></div>
           <div class="t-info">
