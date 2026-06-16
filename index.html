@@ -625,6 +625,18 @@ body { font-family: 'Nunito', system-ui, sans-serif; background: #FFF8EE; min-he
   <div class="ixl-dd-list" id="ixl-dd-list"></div>
 </div>
 
+<div class="ixl-dd-backdrop" id="ixl-read-dd-backdrop" onclick="closeIxlReadingDropdown()"></div>
+<div class="ixl-dd" id="ixl-read-dd">
+  <div class="ixl-dd-hdr">
+    <div>
+      <div class="ixl-dd-title">🔖 IXL Reading</div>
+      <div class="ixl-dd-sub" id="ixl-read-dd-sub">0/5 skills done</div>
+    </div>
+    <button class="ixl-dd-close" onclick="closeIxlReadingDropdown()">✕</button>
+  </div>
+  <div class="ixl-dd-list" id="ixl-read-dd-list"></div>
+</div>
+
 <script>
 // ── TASK DEFINITIONS ──
 const T = {
@@ -633,8 +645,9 @@ const T = {
   coding:    { en:"Coding",     zh:"程式設計",  min:"30分", color:"#00a651", emoji:"💻" },
   chinese:   { en:"Chinese",    zh:"中文閱讀",  min:"15分", color:"#e67e22", emoji:"📖" },
   violin:    { en:"Violin",     zh:"小提琴",   min:"20分", color:"#d4a017", emoji:"🎻" },
-  reading:   { en:"Fiction",    zh:"故事閱讀",  min:"20分", color:"#a29bfe", emoji:"📕" },
-  nonfiction:{ en:"Nonfiction", zh:"科普閱讀",  min:"15分", color:"#00cec9", emoji:"📰" },
+  reading:     { en:"Fiction",      zh:"故事閱讀",  min:"20分", color:"#a29bfe", emoji:"📕" },
+  nonfiction:  { en:"Nonfiction",   zh:"科普閱讀",  min:"15分", color:"#00cec9", emoji:"📰" },
+  ixl_reading: { en:"IXL Reading",  zh:"IXL 閱讀", min:"20分", color:"#9B59B6", emoji:"🔖" },
 };
 const DOW_ZH = {Mon:"週一",Tue:"週二",Wed:"週三",Thu:"週四",Fri:"週五",Sat:"週六",Sun:"週日"};
 
@@ -675,6 +688,43 @@ const IXL_ALL = [
 ];
 // Flat list for easy lookup
 const IXL_FLAT = IXL_ALL.flatMap(d => d.skills);
+
+// ── MATH DAILY SCHEDULE ──
+const MATH_IXL_IDS = ["m01a","m01b","m01c","m01d","m02a","m02b","m03a","m03b","m03c","m04a","m04b","m04c"];
+const IXL_READ_IDS = ["r01a","r02a","r02b","r03a","r03b"];
+
+// Assign one math skill per weekday (Mon/Wed/Fri) in order; Sat = kangaroo; after 12 skills = free
+const MATH_SCHEDULE = (()=>{
+  const s={}; let idx=0;
+  WEEKS.forEach(wk=>wk.days.forEach(day=>{
+    if(!(day.tasks||[]).includes('math')) return;
+    s[day.date] = day.dow==='Sat' ? 'kangaroo'
+      : idx < MATH_IXL_IDS.length ? MATH_IXL_IDS[idx++] : 'free';
+  }));
+  return s;
+})();
+
+function getDayMathMode(day){
+  const m=MATH_SCHEDULE[day.date];
+  if(!m||m==='free') return {mode:'free'};
+  if(m==='kangaroo') return {mode:'kangaroo'};
+  return {mode:'skill', skill:IXL_FLAT.find(s=>s.id===m), skillId:m};
+}
+
+// Effective task list — adds ixl_reading on Tue/Thu/Sat
+function getEffectiveTasks(day){
+  if(!day.tasks) return [];
+  const tasks=[...day.tasks];
+  if(!day.free&&!day.makeup&&['Tue','Thu','Sat'].includes(day.dow)&&tasks.length>0)
+    if(!tasks.includes('ixl_reading')) tasks.push('ixl_reading');
+  return tasks;
+}
+
+// ixl_reading counts as done when all reading skills completed (or manually checked)
+function isTaskEffDone(wi,di,t){
+  if(t==='ixl_reading') return IXL_READ_IDS.every(id=>!!S[`ixl_${id}`]) || isDone(wi,di,t);
+  return isDone(wi,di,t);
+}
 
 // ── WEEKS (violin now Thu + Sat = 2x/week) ──
 const WEEKS = [
@@ -828,7 +878,7 @@ const isDayDone = (wi,di) => {
   const d=WEEKS[wi].days[di];
   if(d.free) return true;
   if(d.makeup) return getMakeupTasks(wi).length===0;
-  return (d.tasks||[]).every(t=>isDone(wi,di,t));
+  return getEffectiveTasks(d).every(t=>isTaskEffDone(wi,di,t));
 };
 const isIxlDone = (id) => !!S[ixlKey(id)];
 const getIxlCount = () => IXL_FLAT.filter(m=>isIxlDone(m.id)).length;
@@ -917,7 +967,7 @@ function postponeTask(wi,di,t,evt){
 // ── ACTIONS ──
 function spinForTask(wi,di){
   const day=WEEKS[wi].days[di];
-  const pending=(day.tasks||[]).filter(t=>!isDone(wi,di,t)&&!isPostponed(wi,di,t));
+  const pending=getEffectiveTasks(day).filter(t=>!isTaskEffDone(wi,di,t)&&!isPostponed(wi,di,t));
   if(pending.length===0) return;
 
   const btn=document.getElementById('spin-btn');
@@ -1122,6 +1172,51 @@ function openIxlDropdown(evt){
 function closeIxlDropdown(){
   document.getElementById("ixl-dd").classList.remove("open");
   document.getElementById("ixl-dd-backdrop").classList.remove("open");
+  render();
+}
+
+function openIxlReadingDropdown(evt){
+  if(evt) evt.stopPropagation();
+  const dd=document.getElementById("ixl-read-dd");
+  const backdrop=document.getElementById("ixl-read-dd-backdrop");
+  const src=evt?.currentTarget||evt?.target;
+  if(src){
+    const r=src.getBoundingClientRect();
+    dd.style.top=Math.min(r.bottom+8,window.innerHeight*0.28)+"px";
+  } else {
+    dd.style.top="140px";
+  }
+  buildIxlReadingList();
+  dd.classList.add("open");
+  backdrop.classList.add("open");
+}
+function closeIxlReadingDropdown(){
+  document.getElementById("ixl-read-dd").classList.remove("open");
+  document.getElementById("ixl-read-dd-backdrop").classList.remove("open");
+  render();
+}
+function buildIxlReadingList(){
+  const listEl=document.getElementById("ixl-read-dd-list");
+  const done=IXL_READ_IDS.filter(id=>!!S[`ixl_${id}`]).length;
+  document.getElementById("ixl-read-dd-sub").textContent=`${done}/${IXL_READ_IDS.length} skills done`;
+  listEl.innerHTML=IXL_READ_IDS.map(id=>{
+    const sk=IXL_FLAT.find(s=>s.id===id);
+    if(!sk) return '';
+    const isDone=!!S[`ixl_${id}`];
+    return `<div class="ixl-dd-row${isDone?" done":""}" onclick="toggleIxlRead('${id}',event)">
+      <div class="ixl-dd-cb${isDone?" on":""}"><span class="ixl-dd-cb-mark">✓</span></div>
+      <div style="flex:1">
+        <div class="ixl-dd-name${isDone?" done":""}">${sk.title}</div>
+        <div style="font-size:11px;color:#9B59B6;font-weight:800;font-family:monospace;margin-top:2px">${sk.code} · ${sk.grade}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+function toggleIxlRead(id,evt){
+  if(evt) evt.stopPropagation();
+  S[`ixl_${id}`]=!S[`ixl_${id}`];
+  saveState();
+  buildIxlReadingList();
   render();
 }
 
@@ -1340,27 +1435,72 @@ function renderDayDetail(wi, di){
       });
     }
 
-    (day.tasks||[]).forEach(t=>{
+    getEffectiveTasks(day).forEach(t=>{
       const checked=isDone(wi,di,t);
+      const effDone=isTaskEffDone(wi,di,t);
       const postponed=isPostponed(wi,di,t);
       const def=T[t];
-      const canPostpone=!checked && !postponed && !!nextDay(wi,di);
+      const canPostpone=!checked && !postponed && !!nextDay(wi,di) && t!=='ixl_reading';
       const pBtn=canPostpone ? `<button class="postpone-btn" onclick="postponeTask(${wi},${di},'${t}',event)">→ 明天</button>` : '';
       const pBadge=postponed ? `<span class="postponed-badge">→ 明天</span>` : '';
+
       if(t==="math" && !locked){
-        const catDone=getIxlCatDone();
-        html+=`<div class="big-task${checked||postponed?" done-task":""}" data-task="math" onclick="openIxlDropdown(event)">
-          <div class="big-cb${checked?" on":""}" onclick="event.stopPropagation();toggle(${wi},${di},'math',event)"><span class="big-cb-mark">✓</span></div>
-          <div class="big-t-info">
-            <div class="big-t-en${checked||postponed?" done":""}" style="color:${checked||postponed?"#ccc":def.color}">${def.emoji} ${def.zh}</div>
-            <div class="big-t-zh${checked?" done":""}">${def.en} <span class="big-t-min">${def.min}</span></div>
-          </div>
-          <div style="text-align:right;flex-shrink:0;display:flex;flex-direction:column;align-items:flex-end;gap:4px">
-            ${pBadge}${pBtn}
-            <div style="font-size:12px;font-weight:800;color:#7AAAE0">${catDone}/${IXL_CATS} ▾</div>
-            <div style="font-size:11px;font-weight:800;color:#FD79A8">~1 per week 🎯</div>
-          </div>
-        </div>`;
+        const mm=getDayMathMode(day);
+        if(mm.mode==='kangaroo'){
+          html+=`<div class="big-task${checked?" done-task":""}" data-task="math" onclick="toggle(${wi},${di},'math',event)">
+            <div class="big-cb${checked?" on":""}"><span class="big-cb-mark">✓</span></div>
+            <div class="big-t-info">
+              <div class="big-t-en${checked?" done":""}" style="color:${checked?"#ccc":"#e67e22"}">🦘 袋鼠數學</div>
+              <div class="big-t-zh${checked?" done":""}">Kangaroo Math</div>
+            </div>${pBadge}${pBtn}
+          </div>`;
+        } else if(mm.mode==='free'){
+          html+=`<div class="big-task${checked?" done-task":""}" data-task="math" onclick="toggle(${wi},${di},'math',event)">
+            <div class="big-cb${checked?" on":""}"><span class="big-cb-mark">✓</span></div>
+            <div class="big-t-info">
+              <div class="big-t-en${checked?" done":""}" style="color:${checked?"#ccc":"#0984e3"}">⏱️ 自由數學練習</div>
+              <div class="big-t-zh${checked?" done":""}">Free Math Practice <span class="big-t-min">20分</span></div>
+            </div>${pBadge}${pBtn}
+          </div>`;
+        } else {
+          const sk=mm.skill;
+          const skDone=sk?!!S[`ixl_${mm.skillId}`]:false;
+          html+=`<div class="big-task${checked||skDone?" done-task":""}" data-task="math" onclick="toggle(${wi},${di},'math',event)">
+            <div class="big-cb${checked?" on":""}" onclick="event.stopPropagation();toggle(${wi},${di},'math',event)"><span class="big-cb-mark">✓</span></div>
+            <div class="big-t-info">
+              <div class="big-t-en${checked?" done":""}" style="color:${checked?"#ccc":"#0984e3"}">📚 ${sk?sk.title:'IXL Math'}</div>
+              <div class="big-t-zh${checked?" done":""}"><span style="font-family:monospace;font-size:13px;background:#EEF4FF;color:#2860B0;padding:1px 6px;border-radius:5px;font-weight:900">${sk?sk.code:''}</span> <span class="big-t-min">ixl.com</span></div>
+            </div>
+            <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0">
+              ${pBadge}${pBtn}
+            </div>
+          </div>`;
+        }
+
+      } else if(t==="ixl_reading"){
+        const allReadDone=IXL_READ_IDS.every(id=>!!S[`ixl_${id}`]);
+        const readDone=IXL_READ_IDS.filter(id=>!!S[`ixl_${id}`]).length;
+        if(allReadDone){
+          html+=`<div class="big-task done-task" data-task="ixl_reading">
+            <div class="big-cb on"><span class="big-cb-mark">✓</span></div>
+            <div class="big-t-info">
+              <div class="big-t-en done" style="color:#ccc">🔖 IXL 閱讀</div>
+              <div class="big-t-zh done">All reading skills done! 🎉</div>
+            </div>
+          </div>`;
+        } else {
+          html+=`<div class="big-task" data-task="ixl_reading" onclick="openIxlReadingDropdown(event)">
+            <div class="big-cb${checked?" on":""}" onclick="event.stopPropagation();toggle(${wi},${di},'ixl_reading',event)"><span class="big-cb-mark">✓</span></div>
+            <div class="big-t-info">
+              <div class="big-t-en" style="color:#9B59B6">🔖 IXL 閱讀</div>
+              <div class="big-t-zh">IXL Reading <span class="big-t-min">20分</span></div>
+            </div>
+            <div style="text-align:right;flex-shrink:0;display:flex;flex-direction:column;align-items:flex-end;gap:4px">
+              <div style="font-size:12px;font-weight:800;color:#9B59B6">${readDone}/${IXL_READ_IDS.length} ▾</div>
+            </div>
+          </div>`;
+        }
+
       } else if(t==="chinese" && !locked){
         html+=`<div class="big-task${checked||postponed?" done-task":""}" data-task="chinese" onclick="openZhDropdown(event)">
           <div class="big-cb${checked?" on":""}" onclick="event.stopPropagation();toggle(${wi},${di},'chinese',event)"><span class="big-cb-mark">✓</span></div>
@@ -1477,15 +1617,30 @@ function renderWeekView(){
           </div>`;
         });
       }
-      (d.tasks||[]).forEach(t=>{
+      getEffectiveTasks(d).forEach(t=>{
         const checked=isDone(wi,di,t);
         const postponed=isPostponed(wi,di,t);
         const def=T[t];
         let handler, rightSide='';
         if(!locked && t==="math"){
-          const cnt=getIxlCount();
-          handler=`onclick="openIxlDropdown(event)"`;
-          rightSide=`<span style="font-size:10px;font-weight:800;color:#7AAAE0;flex-shrink:0">${getIxlCatDone()}/${IXL_CATS}</span>`;
+          const mm=getDayMathMode(d);
+          if(mm.mode==='kangaroo'){
+            handler=`onclick="toggle(${wi},${di},'math',event)"`;
+            rightSide=`<span style="font-size:10px;font-weight:800;color:#e67e22;flex-shrink:0">🦘</span>`;
+          } else if(mm.mode==='free'){
+            handler=`onclick="toggle(${wi},${di},'math',event)"`;
+            rightSide=`<span style="font-size:10px;font-weight:800;color:#0984e3;flex-shrink:0">⏱️</span>`;
+          } else {
+            handler=`onclick="toggle(${wi},${di},'math',event)"`;
+            const sk=mm.skill;
+            rightSide=`<span style="font-size:10px;font-weight:800;color:#7AAAE0;flex-shrink:0;font-family:monospace">${sk?sk.code:''}</span>`;
+          }
+        } else if(t==="ixl_reading"){
+          const allReadDone=IXL_READ_IDS.every(id=>!!S[`ixl_${id}`]);
+          const readDone=IXL_READ_IDS.filter(id=>!!S[`ixl_${id}`]).length;
+          handler=allReadDone?"":`onclick="openIxlReadingDropdown(event)"`;
+          rightSide=allReadDone?`<span style="font-size:10px;font-weight:800;color:#9B59B6;flex-shrink:0">✓</span>`
+            :`<span style="font-size:10px;font-weight:800;color:#9B59B6;flex-shrink:0">${readDone}/${IXL_READ_IDS.length}</span>`;
         } else if(!locked && t==="chinese"){
           handler=`onclick="openZhDropdown(event)"`;
           rightSide=`<span style="font-size:11px;font-weight:800;color:#e67e22;flex-shrink:0">▶</span>`;
@@ -1493,12 +1648,16 @@ function renderWeekView(){
           handler=locked?"":`onclick="toggle(${wi},${di},'${t}',event)"`;
         }
         if(postponed) rightSide=`<span class="postponed-badge">→</span>`;
-        const dispMin = (t==='reading' && (d.tasks||[]).includes('nonfiction')) ? '15分' : def.min;
-        const cbHandler=(!locked&&(t==="math"||t==="chinese"))?`onclick="event.stopPropagation();toggle(${wi},${di},'${t}',event)"`:"";
+        const dispMin = (t==='reading' && getEffectiveTasks(d).includes('nonfiction')) ? '15分' : (def?def.min:'');
+        const cbHandler=(!locked&&(t==="math"||t==="chinese"||t==="ixl_reading"))?`onclick="event.stopPropagation();toggle(${wi},${di},'${t}',event)"`:"";
+        const label = t==='ixl_reading' ? '🔖 IXL 閱讀'
+          : t==='math' && getDayMathMode(d).mode==='kangaroo' ? '🦘 袋鼠數學'
+          : t==='math' && getDayMathMode(d).mode==='free' ? '⏱️ 自由數學'
+          : def?`${def.emoji} ${def.zh}`:'';
         html+=`<div class="task${locked?" locked-task":""}" ${handler}>
           <div class="cb${checked?" on":""}" ${cbHandler}><span class="cb-mark">✓</span></div>
           <div class="t-info">
-            <div class="t-en${checked||postponed?" done":""}" style="color:${checked||postponed?"#ccc":def.color}">${def.emoji} ${def.zh} <span class="t-min">${dispMin}</span></div>
+            <div class="t-en${checked||postponed?" done":""}" style="color:${checked||postponed?"#ccc":def?def.color:'#9B59B6'}">${label} <span class="t-min">${dispMin}</span></div>
           </div>
           ${rightSide}
         </div>`;
