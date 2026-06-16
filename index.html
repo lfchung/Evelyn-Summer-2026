@@ -612,6 +612,41 @@ body { font-family: 'Nunito', system-ui, sans-serif; background: #FFF8EE; min-he
   </div>
 </div>
 
+<!-- ADD TASK MODAL -->
+<div class="ixl-dd-backdrop" id="addtask-backdrop" onclick="closeAddTask()"></div>
+<div class="ixl-dd" id="addtask-modal" style="border-color:#6C5CE7">
+  <div class="ixl-dd-hdr" style="border-color:#EEE">
+    <div>
+      <div class="ixl-dd-title" style="color:#6C5CE7">➕ Add a task</div>
+      <div class="ixl-dd-sub">Type what + when, e.g. "count allowance jun 15"</div>
+    </div>
+    <button class="ixl-dd-close" onclick="closeAddTask()">✕</button>
+  </div>
+  <div style="padding:14px 16px 18px;display:flex;flex-direction:column;gap:10px">
+    <textarea id="addtask-input" rows="2"
+      style="width:100%;box-sizing:border-box;border:2px solid #ddd;border-radius:12px;padding:10px 12px;font-size:16px;font-family:inherit;resize:none;outline:none"
+      placeholder="count allowance jun 15"
+      onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();submitAddTask()}"
+    ></textarea>
+    <div id="addtask-error" style="color:#e17055;font-size:13px;font-weight:700;display:none"></div>
+    <div style="display:flex;gap:8px;justify-content:flex-end">
+      <button onclick="closeAddTask()" style="padding:8px 16px;border-radius:10px;border:2px solid #ddd;background:#fff;font-size:14px;font-weight:700;cursor:pointer">Cancel</button>
+      <button onclick="submitAddTask()" style="padding:8px 18px;border-radius:10px;border:none;background:#6C5CE7;color:#fff;font-size:14px;font-weight:800;cursor:pointer">Add →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADD TASK TOAST -->
+<div id="addtask-toast" style="
+  position:fixed;bottom:80px;left:50%;transform:translateX(-50%);
+  background:#2d3436;color:#fff;border-radius:14px;padding:10px 16px;
+  font-size:14px;font-weight:700;display:none;z-index:9000;
+  align-items:center;gap:10px;box-shadow:0 4px 20px rgba(0,0,0,0.3)
+">
+  <span id="addtask-toast-msg"></span>
+  <button id="addtask-undo-btn" onclick="undoAddTask()" style="background:#6C5CE7;border:none;color:#fff;border-radius:8px;padding:4px 10px;font-size:13px;font-weight:800;cursor:pointer">Undo</button>
+</div>
+
 <!-- IXL FLOATING DROPDOWN -->
 <div class="ixl-dd-backdrop" id="ixl-dd-backdrop" onclick="closeIxlDropdown()"></div>
 <div class="ixl-dd" id="ixl-dd">
@@ -1144,6 +1179,76 @@ function closeIxlDropdown(){
   render();
 }
 
+// ── CUSTOM TASKS ──
+const MONTH_PARSE = {
+  jan:'Jan',january:'Jan',feb:'Feb',february:'Feb',mar:'Mar',march:'Mar',
+  apr:'Apr',april:'Apr',may:'May',jun:'Jun',june:'Jun',jul:'Jul',july:'Jul',
+  aug:'Aug',august:'Aug',sep:'Sep',september:'Sep',oct:'Oct',october:'Oct',
+  nov:'Nov',november:'Nov',dec:'Dec',december:'Dec'
+};
+function parseTaskInput(raw){
+  // Match "month day" or "day month" patterns
+  const re=/\b(jan(?:uary)?|feb(?:ruary)?|mar(?:ch)?|apr(?:il)?|may|jun(?:e)?|jul(?:y)?|aug(?:ust)?|sep(?:tember)?|oct(?:ober)?|nov(?:ember)?|dec(?:ember)?)\s+(\d{1,2})\b/i;
+  const m=raw.match(re);
+  if(!m) return null;
+  const mon=MONTH_PARSE[m[1].toLowerCase()];
+  const day=parseInt(m[2]);
+  const date=`${mon} ${day}`;
+  // Check date exists in WEEKS
+  const found=WEEKS.flatMap(w=>w.days).find(d=>d.date===date);
+  if(!found) return {error:`${date} isn't in the schedule`};
+  // Strip date + surrounding filler words from text
+  let text=raw.replace(re,'').replace(/\bfor\b|\bon\b/gi,'').replace(/\s+/g,' ').trim();
+  if(!text) text=raw.trim();
+  return {date, text};
+}
+function getCustomTasks(date){ return (S.custom_tasks||[]).filter(t=>t.date===date); }
+let _lastAddedTask=null, _toastTimer=null;
+function openAddTask(){
+  document.getElementById('addtask-modal').style.top='140px';
+  document.getElementById('addtask-modal').classList.add('open');
+  document.getElementById('addtask-backdrop').classList.add('open');
+  document.getElementById('addtask-error').style.display='none';
+  document.getElementById('addtask-input').value='';
+  setTimeout(()=>document.getElementById('addtask-input').focus(),80);
+}
+function closeAddTask(){
+  document.getElementById('addtask-modal').classList.remove('open');
+  document.getElementById('addtask-backdrop').classList.remove('open');
+}
+function submitAddTask(){
+  const raw=document.getElementById('addtask-input').value.trim();
+  if(!raw) return;
+  const errEl=document.getElementById('addtask-error');
+  const result=parseTaskInput(raw);
+  if(!result){ errEl.textContent="Couldn't find a date — try something like 'count allowance jun 15'"; errEl.style.display='block'; return; }
+  if(result.error){ errEl.textContent=result.error; errEl.style.display='block'; return; }
+  const task={id:'ct_'+Date.now(), date:result.date, text:result.text};
+  if(!S.custom_tasks) S.custom_tasks=[];
+  S.custom_tasks.push(task);
+  _lastAddedTask=task;
+  save(); closeAddTask(); render();
+  showToast(`Added to ${result.date}: "${result.text}"`);
+}
+function toggleCustom(id){ S[id]=!S[id]; save(); render(); }
+function deleteCustomTask(id){
+  S.custom_tasks=(S.custom_tasks||[]).filter(t=>t.id!==id);
+  delete S[id];
+  save(); render();
+}
+function undoAddTask(){
+  if(_lastAddedTask){ deleteCustomTask(_lastAddedTask.id); _lastAddedTask=null; }
+  hideToast();
+}
+function showToast(msg){
+  const t=document.getElementById('addtask-toast');
+  document.getElementById('addtask-toast-msg').textContent=msg;
+  t.style.display='flex';
+  clearTimeout(_toastTimer);
+  _toastTimer=setTimeout(hideToast,4500);
+}
+function hideToast(){ document.getElementById('addtask-toast').style.display='none'; }
+
 // ── TREASURE CHEST ──
 const TASK_GEMS = { piano:"🔮", math:"💎", coding:"🌟", chinese:"🏮", violin:"⭐", reading:"💖", nonfiction:"🫧" };
 
@@ -1407,8 +1512,25 @@ function renderDayDetail(wi, di){
         </div>`;
       }
     });
-    html+=`</div>`;
 
+    // Custom tasks for this day
+    const customTasks=getCustomTasks(day.date);
+    if(customTasks.length>0){
+      html+=`<div style="margin-top:6px;display:flex;flex-direction:column;gap:8px">`;
+      customTasks.forEach(ct=>{
+        const done=!!S[ct.id];
+        html+=`<div class="big-task${done?' done-task':''}" style="border-style:dashed" onclick="toggleCustom('${ct.id}')">
+          <div class="big-cb${done?' on':''}" onclick="event.stopPropagation();toggleCustom('${ct.id}')"><span class="big-cb-mark">✓</span></div>
+          <div class="big-t-info">
+            <div class="big-t-en${done?' done':''}" style="color:${done?'#ccc':'#6C5CE7'}">${ct.text}</div>
+          </div>
+          <button onclick="event.stopPropagation();deleteCustomTask('${ct.id}')" style="background:none;border:none;color:#ccc;font-size:16px;cursor:pointer;padding:4px 6px;flex-shrink:0" title="Delete">✕</button>
+        </div>`;
+      });
+      html+=`</div>`;
+    }
+
+    html+=`</div>`;
   }
 
   el.innerHTML=html;
@@ -1431,6 +1553,9 @@ function renderWeekView(){
       </button>
       <button class="wk-zh-btn" onclick="openZhDropdown(event)">
         <span class="wk-zh-lbl">📖 中文影片</span>
+      </button>
+      <button class="wk-zh-btn" onclick="openAddTask()" style="background:#F3F0FF;border-color:#6C5CE7;color:#6C5CE7">
+        <span class="wk-zh-lbl">➕ 新增</span>
       </button>
     </div>
   </div>
