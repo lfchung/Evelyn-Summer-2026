@@ -641,117 +641,36 @@ const DOW_ZH = {Mon:"週一",Tue:"週二",Wed:"週三",Thu:"週四",Fri:"週五"
 // ── IXL ALL SKILLS — full 20-day Summer Adventures list (72 skills, matches PDF) ──
 const SUBJ_COLOR = { Math:"#0984e3", ELA:"#00a651", Science:"#e17055", SS:"#a29bfe" };
 const IXL_ALL = [
-  { day:1,  theme:"🖼️ A picture is worth a thousand words", skills:[
-    {id:"d01a",code:"ZS9",title:"Which feeling matches the picture?",             subj:"ELA"},
-    {id:"d01b",code:"MUX",title:"Add a two-digit and a one-digit number",         subj:"Math"},
-    {id:"d01c",code:"C96",title:"Observe traits",                                 subj:"Science"},
-    {id:"d01d",code:"DUU",title:"Identify American symbols, landmarks & monuments",subj:"SS"},
+  { day:1, theme:"🔢 Number & Operations in Base Ten", skills:[
+    {id:"m01a",code:"Y7Q",title:"Place value names",                              subj:"Math", grade:"4th"},
+    {id:"m01b",code:"EHT",title:"Subtract numbers up to three digits",            subj:"Math", grade:"3rd"},
+    {id:"m01c",code:"E83",title:"Add two numbers up to three digits",             subj:"Math", grade:"3rd"},
+    {id:"m01d",code:"LXP",title:"Find equivalent fractions using fraction strips",subj:"Math", grade:"3rd"},
   ]},
-  { day:2,  theme:"🗂️ Categories", skills:[
-    {id:"d02a",code:"R89",title:"Sort words into categories",                     subj:"ELA"},
-    {id:"d02b",code:"9S3",title:"Which word is not like the others?",             subj:"ELA"},
-    {id:"d02c",code:"PNU",title:"Count shapes in a Venn diagram",                 subj:"Math"},
-    {id:"d02d",code:"X8A",title:"Identify solids, liquids, and gases",            subj:"Science"},
+  { day:2, theme:"✖️ Operations & Algebraic Thinking", skills:[
+    {id:"m02a",code:"UYK",title:"Divide by counting equal groups",                subj:"Math", grade:"3rd"},
+    {id:"m02b",code:"PNV",title:"Multiplication facts up to 10",                  subj:"Math", grade:"3rd"},
   ]},
-  { day:3,  theme:"🍕 Fraction action", skills:[
-    {id:"d03a",code:"WVL",title:"Identify halves and fourths",                    subj:"Math"},
-    {id:"d03b",code:"X5A",title:"Make halves and fourths",                        subj:"Math"},
-    {id:"d03c",code:"DVJ",title:"Complete the sentence with an action verb",      subj:"ELA"},
-    {id:"d03d",code:"2WX",title:"Identify action verbs",                          subj:"ELA"},
+  { day:3, theme:"📏 Measurement & Data", skills:[
+    {id:"m03a",code:"L5U",title:"Match analog and digital clocks",                subj:"Math", grade:"3rd"},
+    {id:"m03b",code:"PTF",title:"Which metric unit of mass is appropriate?",      subj:"Math", grade:"3rd"},
+    {id:"m03c",code:"Y5D",title:"Interpret scaled picture graphs",                subj:"Math", grade:"3rd"},
   ]},
-  { day:4,  theme:"📅 Hours, days, months, and years", skills:[
-    {id:"d04a",code:"UJM",title:"Read clocks and write times",                    subj:"Math"},
-    {id:"d04b",code:"ZXK",title:"Read a calendar I",                              subj:"Math"},
-    {id:"d04c",code:"A62",title:"Place sentences on a timeline",                  subj:"SS"},
-    {id:"d04d",code:"9Z9",title:"Lunar New Year",                                 subj:"SS"},
+  { day:4, theme:"📐 Geometry", skills:[
+    {id:"m04a",code:"73H",title:"Area",                                           subj:"Math", grade:"2nd"},
+    {id:"m04b",code:"65F",title:"Make thirds",                                    subj:"Math", grade:"2nd"},
+    {id:"m04c",code:"V6L",title:"Identify parallelograms",                        subj:"Math", grade:"3rd"},
   ]},
-  { day:5,  theme:"🔍 Detective work", skills:[
-    {id:"d05a",code:"7QZ",title:"What am I?",                                     subj:"ELA"},
-    {id:"d05b",code:"U6J",title:"Skip-counting puzzles",                          subj:"Math"},
+  { day:5, theme:"🔤 Foundational Reading Skills", skills:[
+    {id:"r01a",code:"M2J",title:"Spell words with prefixes: con-, over-, pro-",   subj:"ELA",  grade:"5th"},
   ]},
-  { day:6,  theme:"🔟 Ten takeover", skills:[
-    {id:"d06a",code:"CLA",title:"Ten more or less",                               subj:"Math"},
-    {id:"d06b",code:"EMK",title:"Add multiples of ten",                           subj:"Math"},
-    {id:"d06c",code:"9DD",title:"Subtract multiples of ten",                      subj:"Math"},
-    {id:"d06d",code:"N89",title:"Skip-count by tens",                             subj:"Math"},
+  { day:6, theme:"📖 Reading: Literature", skills:[
+    {id:"r02a",code:"PG7",title:"Label the rhyme scheme",                         subj:"ELA",  grade:"5th"},
+    {id:"r02b",code:"U9D",title:"Read fantasy with illustrations",                subj:"ELA",  grade:"5th"},
   ]},
-  { day:7,  theme:"📚 Fact or fiction", skills:[
-    {id:"d07a",code:"Z6B",title:"Read along with fantasy",                        subj:"ELA"},
-    {id:"d07b",code:"Y2M",title:"Read along with realistic fiction",              subj:"ELA"},
-    {id:"d07c",code:"6TM",title:"Addition facts — sums up to 20",                subj:"Math"},
-    {id:"d07d",code:"PV5",title:"Subtraction facts — up to 20",                  subj:"Math"},
-  ]},
-  { day:8,  theme:"🧪 Mixing it up", skills:[
-    {id:"d08a",code:"NCC",title:"Identify mixtures",                              subj:"Science"},
-    {id:"d08b",code:"3N2",title:"Put numbers up to 1,000 in order",              subj:"Math"},
-    {id:"d08c",code:"KP6",title:"Which addition or subtraction sentence is true?",subj:"Math"},
-    {id:"d08d",code:"B2G",title:"Irregular plurals: select the word that matches the picture",subj:"ELA"},
-  ]},
-  { day:9,  theme:"🚀 Small step, giant leap!", skills:[
-    {id:"d09a",code:"KPV",title:"Neil Armstrong",                                 subj:"SS"},
-    {id:"d09b",code:"KWU",title:"Skip-count by fives",                           subj:"Math"},
-    {id:"d09c",code:"HBW",title:"Use number lines to add two-digit numbers",     subj:"Math"},
-    {id:"d09d",code:"ZHA",title:"Read about famous places",                       subj:"SS"},
-  ]},
-  { day:10, theme:"🎉 Special days", skills:[
-    {id:"d10a",code:"9S6",title:"Capitalize days and months",                     subj:"ELA"},
-    {id:"d10b",code:"2B4",title:"Holi",                                           subj:"SS"},
-  ]},
-  { day:11, theme:"🔭 What is that?", skills:[
-    {id:"d11a",code:"26D",title:"Name the three-dimensional shape",               subj:"Math"},
-    {id:"d11b",code:"TKV",title:"Guess the number",                               subj:"Math"},
-    {id:"d11c",code:"U7K",title:"Identify plants and animals",                    subj:"Science"},
-    {id:"d11d",code:"Z7W",title:"Identify oceans and continents",                subj:"SS"},
-  ]},
-  { day:12, theme:"👀 Seeing double", skills:[
-    {id:"d12a",code:"S57",title:"Add doubles using models",                       subj:"Math"},
-    {id:"d12b",code:"8Z7",title:"Add doubles",                                    subj:"Math"},
-    {id:"d12c",code:"ATP",title:"Put two syllables together to create a word",   subj:"ELA"},
-    {id:"d12d",code:"JGR",title:"Complete the two-syllable words",                subj:"ELA"},
-  ]},
-  { day:13, theme:"🌍 Shaking things up", skills:[
-    {id:"d13a",code:"HNG",title:"Count forward and backward by twos, fives, tens, and hundreds",subj:"Math"},
-    {id:"d13b",code:"UDZ",title:"Unscramble the words to make a complete sentence",subj:"ELA"},
-    {id:"d13c",code:"T5U",title:"Changes to Earth's surface: earthquakes",        subj:"Science"},
-    {id:"d13d",code:"LGF",title:"Susan B. Anthony",                               subj:"SS"},
-  ]},
-  { day:14, theme:"🧲 Let's stick together", skills:[
-    {id:"d14a",code:"GW7",title:"How do magnets attract and repel each other?",   subj:"Science"},
-    {id:"d14b",code:"5P7",title:"Choose the picture that matches the vowel team word",subj:"ELA"},
-    {id:"d14c",code:"2K8",title:"Add three numbers — use doubles",               subj:"Math"},
-    {id:"d14d",code:"LNL",title:"Add a multiple of ten and a two-digit number",  subj:"Math"},
-  ]},
-  { day:15, theme:"🔨 Break it down", skills:[
-    {id:"d15a",code:"87D",title:"Form compound words with pictures",              subj:"ELA"},
-    {id:"d15b",code:"5ES",title:"Prefixes and suffixes: review",                  subj:"ELA"},
-  ]},
-  { day:16, theme:"🌱 Parts and wholes", skills:[
-    {id:"d16a",code:"EMA",title:"Identify thirds",                                subj:"Math"},
-    {id:"d16b",code:"6SG",title:"Make halves, thirds, and fourths in different ways",subj:"Math"},
-    {id:"d16c",code:"6CW",title:"Body parts and their functions",                 subj:"Science"},
-    {id:"d16d",code:"KDK",title:"Identify plant parts and their functions",       subj:"Science"},
-  ]},
-  { day:17, theme:"⚖️ Compare and contrast", skills:[
-    {id:"d17a",code:"VRW",title:"Compare clocks",                                 subj:"Math"},
-    {id:"d17b",code:"SMZ",title:"Compare pictures using comparative and superlative adjectives",subj:"ELA"},
-    {id:"d17c",code:"59L",title:"Compare properties of objects",                  subj:"Science"},
-    {id:"d17d",code:"2PX",title:"Compare urban, suburban, and rural areas",       subj:"SS"},
-  ]},
-  { day:18, theme:"📏 Measurements and monuments", skills:[
-    {id:"d18a",code:"88A",title:"Measure using an inch ruler",                    subj:"Math"},
-    {id:"d18b",code:"5XG",title:"Which customary unit of length is appropriate: inches or feet?",subj:"Math"},
-    {id:"d18c",code:"P9C",title:"The Washington Monument",                        subj:"SS"},
-    {id:"d18d",code:"E8Y",title:"Mount Rushmore",                                 subj:"SS"},
-  ]},
-  { day:19, theme:"📊 G is for graph", skills:[
-    {id:"d19a",code:"MNB",title:"Sort soft and hard g words and soft and hard c words",subj:"ELA"},
-    {id:"d19b",code:"P8B",title:"Pick the soft g or soft c word that matches the picture",subj:"ELA"},
-    {id:"d19c",code:"WZF",title:"Which picture graph is correct?",                subj:"Math"},
-    {id:"d19d",code:"GFA",title:"Interpret picture graphs",                       subj:"Math"},
-  ]},
-  { day:20, theme:"💰 Money, money, money", skills:[
-    {id:"d20a",code:"S9S",title:"Purchases: do you have enough money?",           subj:"Math"},
-    {id:"d20b",code:"VJA",title:"Compare money amounts",                          subj:"Math"},
+  { day:7, theme:"📰 Reading: Informational Text", skills:[
+    {id:"r03a",code:"75M",title:"Read graphic organizers",                        subj:"ELA",  grade:"5th"},
+    {id:"r03b",code:"L9D",title:"Read about animals",                             subj:"ELA",  grade:"5th"},
   ]},
 ];
 // Flat list for easy lookup
@@ -1085,7 +1004,7 @@ function toggleIxlMod(id,evt){
   // Update the count line in the dropdown header
   const catDone = getIxlCatDone();
   const subEl = document.getElementById('ixl-dd-sub');
-  if(subEl) subEl.textContent = `${catDone}/${IXL_CATS} categories done · ~1 per day 🎯`;
+  if(subEl) subEl.textContent = `${catDone}/${IXL_CATS} categories done · ~1 per week 🎯`;
 
   render(); // update the X/76 badge on the Math/IXL task row
 }
@@ -1111,7 +1030,7 @@ function buildIxlList(){
   const listEl=document.getElementById("ixl-dd-list");
   if(!listEl) return;
   const catDone=getIxlCatDone();
-  document.getElementById("ixl-dd-sub").textContent=`${catDone}/${IXL_CATS} categories done · ~1 per day 🎯`;
+  document.getElementById("ixl-dd-sub").textContent=`${catDone}/${IXL_CATS} categories done · ~1 per week 🎯`;
   listEl.innerHTML="";
   IXL_ALL.forEach(dayObj=>{
     const dayDone=dayObj.skills.filter(m=>isIxlDone(m.id)).length;
@@ -1207,7 +1126,7 @@ function closeIxlDropdown(){
 }
 
 // ── TREASURE CHEST ──
-const TASK_GEMS = { piano:"💜", math:"💙", coding:"💚", chinese:"🧡", violin:"💛", reading:"❤️" };
+const TASK_GEMS = { piano:"🔮", math:"💎", coding:"🟢", chinese:"🟠", violin:"🟡", reading:"🔴", nonfiction:"🔵" };
 
 function getTotalGems(){
   let n=0;
@@ -1439,7 +1358,7 @@ function renderDayDetail(wi, di){
           <div style="text-align:right;flex-shrink:0;display:flex;flex-direction:column;align-items:flex-end;gap:4px">
             ${pBadge}${pBtn}
             <div style="font-size:12px;font-weight:800;color:#7AAAE0">${catDone}/${IXL_CATS} ▾</div>
-            <div style="font-size:11px;font-weight:800;color:#FD79A8">~1 category 🎯</div>
+            <div style="font-size:11px;font-weight:800;color:#FD79A8">~1 per week 🎯</div>
           </div>
         </div>`;
       } else if(t==="chinese" && !locked){
