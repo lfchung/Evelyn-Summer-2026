@@ -1384,7 +1384,7 @@ function renderDayDetail(wi, di){
           </div>
         </div>`;
       } else if(t==="chinese" && !locked){
-        html+=`<div class="big-task${checked||postponed?" done-task":""}" data-task="chinese" onclick="openZhDropdown(event)">
+        html+=`<div class="big-task${checked||postponed?" done-task":""}" data-task="chinese" onclick="toggle(${wi},${di},'chinese',event)">
           <div class="big-cb${checked?" on":""}" onclick="event.stopPropagation();toggle(${wi},${di},'chinese',event)"><span class="big-cb-mark">✓</span></div>
           <div class="big-t-info">
             <div class="big-t-en${checked||postponed?" done":""}" style="color:${checked||postponed?"#ccc":def.color}">${def.emoji} ${def.zh}</div>
@@ -1392,7 +1392,7 @@ function renderDayDetail(wi, di){
           </div>
           <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0">
             ${pBadge}${pBtn}
-            <span style="font-size:13px;font-weight:800;color:#e67e22">▶ 看影片</span>
+            <button class="postpone-btn" style="background:#FFF3E8;color:#e67e22;border-color:#e67e22" onclick="event.stopPropagation();openZhDropdown(event)">▶ 影片</button>
           </div>
         </div>`;
       } else {
