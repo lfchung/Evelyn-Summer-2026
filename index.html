@@ -1413,7 +1413,7 @@ function renderDayDetail(wi, di){
         html+=`<div class="big-task${done?' done-task':''}" style="border-style:dashed" onclick="toggleCustom('${ct.id}')">
           <div class="big-cb${done?' on':''}" onclick="event.stopPropagation();toggleCustom('${ct.id}')"><span class="big-cb-mark">✓</span></div>
           <div class="big-t-info"><div class="big-t-en${done?' done':''}" style="color:${done?'#ccc':'#6C5CE7'}">${ct.text}</div></div>
-          <button onclick="event.stopPropagation();deleteCustomTask('${ct.id}')" style="background:none;border:none;color:#ccc;font-size:16px;cursor:pointer;padding:4px 6px;flex-shrink:0">✕</button>
+          <button onclick="(function(e){e.stopPropagation();deleteCustomTask('${ct.id}');})(event)" style="background:none;border:none;color:#ccc;font-size:16px;cursor:pointer;padding:4px 6px;flex-shrink:0">✕</button>
         </div>`;
       });
       html+=`</div>`;
@@ -1439,7 +1439,7 @@ function renderDayDetail(wi, di){
         html+=`<div class="big-task${done?' done-task':''}" style="border-style:dashed" onclick="toggleCustom('${ct.id}')">
           <div class="big-cb${done?' on':''}" onclick="event.stopPropagation();toggleCustom('${ct.id}')"><span class="big-cb-mark">✓</span></div>
           <div class="big-t-info"><div class="big-t-en${done?' done':''}" style="color:${done?'#ccc':'#6C5CE7'}">${ct.text}</div></div>
-          <button onclick="event.stopPropagation();deleteCustomTask('${ct.id}')" style="background:none;border:none;color:#ccc;font-size:16px;cursor:pointer;padding:4px 6px;flex-shrink:0">✕</button>
+          <button onclick="(function(e){e.stopPropagation();deleteCustomTask('${ct.id}');})(event)" style="background:none;border:none;color:#ccc;font-size:16px;cursor:pointer;padding:4px 6px;flex-shrink:0">✕</button>
         </div>`;
       });
       html+=`</div>`;
@@ -1552,7 +1552,7 @@ function renderDayDetail(wi, di){
           <div class="big-t-info">
             <div class="big-t-en${done?' done':''}" style="color:${done?'#ccc':'#6C5CE7'}">${ct.text}</div>
           </div>
-          <button onclick="event.stopPropagation();deleteCustomTask('${ct.id}')" style="background:none;border:none;color:#ccc;font-size:16px;cursor:pointer;padding:4px 6px;flex-shrink:0" title="Delete">✕</button>
+          <button onclick="(function(e){e.stopPropagation();deleteCustomTask('${ct.id}');})(event)" style="background:none;border:none;color:#ccc;font-size:16px;cursor:pointer;padding:4px 6px;flex-shrink:0" title="Delete">✕</button>
         </div>`;
       });
       html+=`</div>`;
@@ -1677,6 +1677,17 @@ function renderWeekView(){
           ${rightSide}
         </div>`;
       });
+      // Custom tasks in week grid
+      getCustomTasks(d.date).forEach(ct=>{
+        const done=!!S[ct.id];
+        html+=`<div class="task" onclick="toggleCustom('${ct.id}')">
+          <div class="cb${done?' on':''}"><span class="cb-mark">✓</span></div>
+          <div class="t-info">
+            <div class="t-en${done?' done':''}" style="color:${done?'#ccc':'#6C5CE7'};font-style:italic">${ct.text}</div>
+          </div>
+          <span onclick="(function(e){e.stopPropagation();deleteCustomTask('${ct.id}');})(event)" style="color:#ccc;font-size:14px;cursor:pointer;padding:2px 4px">✕</span>
+        </div>`;
+      });
       html+=`</div>`;
     }
     html+=`</div></div>`;
@@ -1717,7 +1728,7 @@ if(sessionStorage.getItem('pw_ok')==='1'){
 
 // ── INIT ──
 const todayInfo=getTodayInfo();
-if(todayInfo){ activeWeek=todayInfo.wi; selectedDay={wi:todayInfo.wi, di:todayInfo.di}; }
+if(todayInfo){ activeWeek=todayInfo.wi; }
 render();
 if(SHEET_URL){
   document.getElementById('sync-status').style.display='block';
