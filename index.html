@@ -1072,6 +1072,7 @@ function toggleIxlMod(id,evt){
 
 // ── DAY SELECTION ──
 function selectDay(wi, di, evt){
+  if(evt && evt.target.closest('.task,.cb,.cb-mark')) return;
   if(evt) evt.stopPropagation();
   selectedDay = {wi, di};
   activeWeek = wi;
