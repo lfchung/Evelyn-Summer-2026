@@ -887,7 +887,9 @@ const isDayDone = (wi,di) => {
   const d=WEEKS[wi].days[di];
   if(d.free) return true;
   if(d.makeup) return getMakeupTasks(wi).length===0;
-  return (d.tasks||[]).every(t=>isDone(wi,di,t));
+  const regularDone=(d.tasks||[]).every(t=>isDone(wi,di,t));
+  const customDone=getCustomTasks(d.date).every(ct=>!!S[ct.id]);
+  return regularDone && customDone;
 };
 const isIxlDone = (id) => !!S[ixlKey(id)];
 const getIxlCount = () => IXL_FLAT.filter(m=>isIxlDone(m.id)).length;
@@ -1246,6 +1248,13 @@ function submitAddTask(){
   showToast(`Added to ${result.date}: "${result.text}"`);
 }
 function toggleCustom(id){ S[id]=!S[id]; save(); render(); }
+function dropTask(event, targetDate){
+  event.preventDefault();
+  const id=event.dataTransfer.getData('ctId');
+  if(!id) return;
+  const ct=(S.custom_tasks||[]).find(t=>t.id===id);
+  if(ct){ ct.date=targetDate; save(); render(); }
+}
 function deleteCustomTask(id){
   S.custom_tasks=(S.custom_tasks||[]).filter(t=>t.id!==id);
   delete S[id];
@@ -1272,6 +1281,7 @@ function getTotalGems(){
   WEEKS.forEach((wk,wi)=>wk.days.forEach((day,di)=>{
     if(day.free) return;
     (day.tasks||[]).forEach(t=>{ if(isDone(wi,di,t)) n++; });
+    getCustomTasks(day.date).forEach(ct=>{ if(S[ct.id]) n++; });
   }));
   return n;
 }
@@ -1285,6 +1295,9 @@ function renderChestWidget(wi, di){
   const gemsHtml = tasks.map(t => {
     const done = isDone(wi, di, t);
     return `<span class="chest-gem${done?'':' empty'}">${TASK_GEMS[t]||'💎'}</span>`;
+  }).join('') + getCustomTasks(day.date).map(ct=>{
+    const done=!!S[ct.id];
+    return `<span class="chest-gem${done?'':' empty'}">✨</span>`;
   }).join('');
 
   return `<div class="chest-widget">
@@ -1310,8 +1323,9 @@ function renderHeader(){
       chipProg.textContent="🌈";
     } else {
       const tasks=day.tasks||[];
-      const done=tasks.filter(t=>isDone(wi,di,t)).length;
-      chipProg.textContent=`${done}/${tasks.length}`;
+      const customs=getCustomTasks(day.date);
+      const done=tasks.filter(t=>isDone(wi,di,t)).length+customs.filter(ct=>!!S[ct.id]).length;
+      chipProg.textContent=`${done}/${tasks.length+customs.length}`;
     }
   } else {
     const d=daysUntilSummer();
@@ -1613,7 +1627,7 @@ function renderWeekView(){
   wk.days.forEach((d,di)=>{
     const dayDone=isDayDone(wi,di);
     const cls=["day",d.free?"is-free":"",(!d.free&&dayDone)?"complete":"",locked?"is-locked":"",isToday(d.date)?"is-today":""].filter(Boolean).join(" ");
-    let html=`<div class="${cls}" onclick="selectDay(${wi},${di},event)" style="cursor:pointer">
+    let html=`<div class="${cls}" onclick="selectDay(${wi},${di},event)" style="cursor:pointer" ondragover="event.preventDefault();this.style.outline='2px dashed #6C5CE7'" ondragleave="this.style.outline=''" ondrop="this.style.outline='';dropTask(event,'${d.date}')">
       <div class="day-accent acc-${d.dow}"></div>
       <div class="day-body">
         <div class="day-dow-row">
@@ -1703,7 +1717,7 @@ function renderWeekView(){
       // Custom tasks in week grid
       getCustomTasks(d.date).forEach(ct=>{
         const done=!!S[ct.id];
-        html+=`<div class="task" onclick="toggleCustom('${ct.id}')">
+        html+=`<div class="task" draggable="true" ondragstart="event.stopPropagation();event.dataTransfer.setData('ctId','${ct.id}')" onclick="toggleCustom('${ct.id}')" style="cursor:grab">
           <div class="cb${done?' on':''}"><span class="cb-mark">✓</span></div>
           <div class="t-info">
             <div class="t-en${done?' done':''}" style="color:${done?'#ccc':'#6C5CE7'}">${ct.text}</div>
