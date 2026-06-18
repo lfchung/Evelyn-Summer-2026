@@ -1643,12 +1643,14 @@ function renderDayDetail(wi, di){
     }
 
     const pastDay=isPastDay(day.date);
+    const bedtimeLocked = isToday(day.date) && new Date().getHours() < 19;
     (day.tasks||[]).forEach(t=>{
       const checked=isDone(wi,di,t);
       const postponed=isPostponed(wi,di,t);
       const def=T[t];
       const frozenDone = pastDay && checked;
-      const canPostpone=!checked && !postponed && !!nextDay(wi,di);
+      const nightLocked = bedtimeLocked && t==='reading' && !checked;
+      const canPostpone=!checked && !postponed && !nightLocked && !!nextDay(wi,di);
       const pBtn=canPostpone ? `<button class="postpone-btn" onclick="postponeTask(${wi},${di},'${t}',event)">→ 明天</button>` : '';
       const pBadge=postponed ? `<span class="postponed-badge">→ 明天</span>` : '';
       if(t==="math" && !locked){
@@ -1682,15 +1684,16 @@ function renderDayDetail(wi, di){
         </div>`;
       } else {
         const dispMin = (t==='reading' && hasNonfiction) ? '15分' : def.min;
-        const clickHandler = frozenDone ? "" : locked ? "" : `onclick="toggle(${wi},${di},'${t}',event)"`;
-        html+=`<div class="big-task${checked||postponed?" done-task":""}${locked?" locked-task":""}" data-task="${t}" ${clickHandler}>
+        const clickHandler = nightLocked ? "" : frozenDone ? "" : locked ? "" : `onclick="toggle(${wi},${di},'${t}',event)"`;
+        const nightBadge = nightLocked ? `<span style="font-size:12px;font-weight:800;color:#b2bec3;flex-shrink:0">🌙 7pm</span>` : '';
+        html+=`<div class="big-task${checked||postponed?" done-task":""}${locked||nightLocked?" locked-task":""}" data-task="${t}" ${clickHandler}>
           <div class="big-cb${checked?" on":""}"><span class="big-cb-mark">✓</span></div>
           <div class="big-t-info">
-            <div class="big-t-en${checked||postponed?" done":""}" style="color:${checked||postponed?"#ccc":def.color}">${def.emoji} ${def.zh}</div>
+            <div class="big-t-en${checked||postponed?" done":""}" style="color:${nightLocked||checked||postponed?"#ccc":def.color}">${def.emoji} ${def.zh}</div>
             <div class="big-t-zh${checked?" done":""}">${def.en} <span class="big-t-min">${dispMin}</span>${def.note?` <span style="font-size:11px;color:#aaa;font-weight:600">· ${def.note}</span>`:''}
             </div>
           </div>
-          ${pBadge}${frozenDone?"":pBtn}
+          ${nightLocked ? nightBadge : pBadge+(frozenDone?"":pBtn)}
         </div>`;
       }
     });
@@ -1807,13 +1810,18 @@ function renderWeekView(){
         });
       }
       const pastDay=isPastDay(d.date);
+      const bedtimeLocked = isToday(d.date) && new Date().getHours() < 19;
       (d.tasks||[]).forEach(t=>{
         const checked=isDone(wi,di,t);
         const postponed=isPostponed(wi,di,t);
         const def=T[t];
         const frozenDone = pastDay && checked;
+        const nightLocked = bedtimeLocked && t==='reading' && !checked;
         let handler, rightSide='';
-        if(frozenDone){
+        if(nightLocked){
+          handler='';
+          rightSide=`<span style="font-size:11px;font-weight:800;color:#b2bec3;flex-shrink:0">🌙 7pm</span>`;
+        } else if(frozenDone){
           handler='';
         } else if(!locked && t==="math"){
           const sk=getDayIxlSkill(d);
@@ -1827,11 +1835,11 @@ function renderWeekView(){
         }
         if(postponed) rightSide=`<span class="postponed-badge">→</span>`;
         const dispMin = (t==='reading' && (d.tasks||[]).includes('nonfiction')) ? '15分' : def.min;
-        const cbHandler=(!locked&&!frozenDone&&t==="chinese")?`onclick="event.stopPropagation();toggle(${wi},${di},'${t}',event)"`:"";
-        html+=`<div class="task${locked?" locked-task":""}${frozenDone?" locked-task":""}" ${handler}>
+        const cbHandler=(!locked&&!frozenDone&&!nightLocked&&t==="chinese")?`onclick="event.stopPropagation();toggle(${wi},${di},'${t}',event)"`:"";
+        html+=`<div class="task${locked?" locked-task":""}${frozenDone?" locked-task":""}${nightLocked?" locked-task":""}" ${handler}>
           <div class="cb${checked?" on":""}" ${cbHandler}><span class="cb-mark">✓</span></div>
           <div class="t-info">
-            <div class="t-en${checked||postponed?" done":""}" style="color:${checked||postponed?"#ccc":def.color}">${def.emoji} ${def.zh} <span class="t-min">${dispMin}</span></div>
+            <div class="t-en${checked||postponed?" done":""}" style="color:${nightLocked?"#ccc":checked||postponed?"#ccc":def.color}">${def.emoji} ${def.zh} <span class="t-min">${dispMin}</span></div>
           </div>
           ${rightSide}
         </div>`;
