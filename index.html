@@ -1094,8 +1094,10 @@ function postponeTask(wi,di,t,evt){
 
 // ── ACTIONS ──
 function spinForTask(wi,di){
-  const day=WEEKS[wi].days[di];
-  const pending=(day.tasks||[]).filter(t=>!isDone(wi,di,t)&&!isPostponed(wi,di,t));
+  const day=effectiveDay(wi,di);
+  const pendingRegular=(day.tasks||[]).filter(t=>!isDone(wi,di,t)&&!isPostponed(wi,di,t));
+  const pendingCustom=getCustomTasks(day.date).filter(ct=>!S[ct.id]).map(ct=>ct.id);
+  const pending=[...pendingRegular,...pendingCustom];
   if(pending.length===0) return;
 
   const btn=document.getElementById('spin-btn');
