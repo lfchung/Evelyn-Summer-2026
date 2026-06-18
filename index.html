@@ -1961,8 +1961,6 @@ if(SHEET_URL){
   pullFromSheet().then(()=>render());
   // Re-pull when switching back to this tab/device
   window.addEventListener('focus', ()=>pullFromSheet().then(()=>render()));
-  // Also poll every 60s while page is open
-  setInterval(()=>pullFromSheet().then(()=>render()), 60000);
 }
 </script>
 </body>
