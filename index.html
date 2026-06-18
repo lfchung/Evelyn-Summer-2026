@@ -819,6 +819,22 @@ async function pushToSheet(){
   } catch(e){ setSyncStatus("err"); }
 }
 
+function mergeState(local, remote){
+  const merged = {...remote};
+  // For boolean keys: true (checked) wins over false
+  for(const [k,v] of Object.entries(local)){
+    if(k==='custom_tasks') continue;
+    if(v===true) merged[k]=true;
+  }
+  // Merge custom_tasks by id (union)
+  const remCTs=(remote.custom_tasks||[]);
+  const locCTs=(local.custom_tasks||[]);
+  const ctMap={};
+  [...remCTs,...locCTs].forEach(ct=>{ctMap[ct.id]=ct;});
+  merged.custom_tasks=Object.values(ctMap);
+  return merged;
+}
+
 async function pullFromSheet(){
   if(!SHEET_URL) return;
   try {
@@ -826,7 +842,7 @@ async function pullFromSheet(){
     const res = await fetch(`${SHEET_URL}?token=${SHEET_TOKEN}`);
     const remote = await res.json();
     if(remote && !remote.error){
-      S = {...S, ...remote};
+      S = mergeState(S, remote);
       localStorage.setItem(SK, JSON.stringify(S));
     }
     setSyncStatus("ok");
@@ -1771,6 +1787,10 @@ render();
 if(SHEET_URL){
   document.getElementById('sync-status').style.display='block';
   pullFromSheet().then(()=>render());
+  // Re-pull when switching back to this tab/device
+  window.addEventListener('focus', ()=>pullFromSheet().then(()=>render()));
+  // Also poll every 60s while page is open
+  setInterval(()=>pullFromSheet().then(()=>render()), 60000);
 }
 </script>
 </body>
