@@ -1685,15 +1685,13 @@ function renderDayDetail(wi, di){
       } else {
         const dispMin = (t==='reading' && hasNonfiction) ? '15分' : def.min;
         const clickHandler = nightLocked ? "" : frozenDone ? "" : locked ? "" : `onclick="toggle(${wi},${di},'${t}',event)"`;
-        const nightBadge = nightLocked ? `<span style="font-size:12px;font-weight:800;color:#b2bec3;flex-shrink:0">🌙 7pm</span>` : '';
-        html+=`<div class="big-task${checked||postponed?" done-task":""}${locked||nightLocked?" locked-task":""}" data-task="${t}" ${clickHandler}>
+        html+=`<div class="big-task${checked||postponed?" done-task":""}${locked?" locked-task":""}" data-task="${t}" ${clickHandler} style="${nightLocked?"background:#EEF0FF;border:2px dashed #b2bec3;":""}">
           <div class="big-cb${checked?" on":""}"><span class="big-cb-mark">✓</span></div>
           <div class="big-t-info">
-            <div class="big-t-en${checked||postponed?" done":""}" style="color:${nightLocked||checked||postponed?"#ccc":def.color}">${def.emoji} ${def.zh}</div>
-            <div class="big-t-zh${checked?" done":""}">${def.en} <span class="big-t-min">${dispMin}</span>${def.note?` <span style="font-size:11px;color:#aaa;font-weight:600">· ${def.note}</span>`:''}
-            </div>
+            <div class="big-t-en${checked||postponed?" done":""}" style="color:${nightLocked||checked||postponed?"#aaa":def.color}">${def.emoji} ${def.zh}</div>
+            <div class="big-t-zh${checked?" done":""}" style="${nightLocked?"color:#a29bfe;font-weight:800;":""}">${nightLocked?"🌙 Unlocks at 7pm":def.en+` <span class="big-t-min">${dispMin}</span>`+((def.note&&!nightLocked)?` <span style="font-size:11px;color:#aaa;font-weight:600">· ${def.note}</span>`:'')}</div>
           </div>
-          ${nightLocked ? nightBadge : pBadge+(frozenDone?"":pBtn)}
+          ${nightLocked ? '' : pBadge+(frozenDone?"":pBtn)}
         </div>`;
       }
     });
@@ -1836,10 +1834,11 @@ function renderWeekView(){
         if(postponed) rightSide=`<span class="postponed-badge">→</span>`;
         const dispMin = (t==='reading' && (d.tasks||[]).includes('nonfiction')) ? '15分' : def.min;
         const cbHandler=(!locked&&!frozenDone&&!nightLocked&&t==="chinese")?`onclick="event.stopPropagation();toggle(${wi},${di},'${t}',event)"`:"";
-        html+=`<div class="task${locked?" locked-task":""}${frozenDone?" locked-task":""}${nightLocked?" locked-task":""}" ${handler}>
+        html+=`<div class="task${locked?" locked-task":""}${frozenDone?" locked-task":""}${nightLocked?" locked-task":""}" ${handler} style="${nightLocked?"background:#EEF0FF;border:1.5px dashed #b2bec3;":""}">
           <div class="cb${checked?" on":""}" ${cbHandler}><span class="cb-mark">✓</span></div>
           <div class="t-info">
-            <div class="t-en${checked||postponed?" done":""}" style="color:${nightLocked?"#ccc":checked||postponed?"#ccc":def.color}">${def.emoji} ${def.zh} <span class="t-min">${dispMin}</span></div>
+            <div class="t-en${checked||postponed?" done":""}" style="color:${nightLocked?"#aaa":checked||postponed?"#ccc":def.color}">${def.emoji} ${def.zh} <span class="t-min">${dispMin}</span></div>
+            ${nightLocked?`<div style="font-size:10px;color:#a29bfe;font-weight:800;margin-top:1px">🌙 Unlocks at 7pm</div>`:''}
           </div>
           ${rightSide}
         </div>`;
