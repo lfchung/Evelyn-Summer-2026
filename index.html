@@ -498,6 +498,70 @@ body { font-family: 'Nunito', system-ui, sans-serif; background: #FFF8EE; min-he
   20%,60%  { transform: translateX(-6px); }
   40%,80%  { transform: translateX(6px); }
 }
+
+/* ── AI CHAT ── */
+.chat-fab {
+  position:fixed; bottom:24px; right:20px; z-index:200;
+  width:52px; height:52px; border-radius:50%;
+  background:linear-gradient(135deg,#6C5CE7,#00B894);
+  color:#fff; font-size:22px; border:none; cursor:pointer;
+  box-shadow:0 4px 18px rgba(108,92,231,0.45);
+  display:flex; align-items:center; justify-content:center;
+  transition:transform 0.15s;
+}
+.chat-fab:hover { transform:scale(1.08); }
+.chat-overlay {
+  position:fixed; inset:0; z-index:300;
+  background:rgba(0,0,0,0.35); display:none; align-items:flex-end;
+}
+.chat-overlay.open { display:flex; }
+.chat-panel {
+  width:100%; max-height:80vh; background:#fff;
+  border-radius:24px 24px 0 0; display:flex; flex-direction:column;
+  box-shadow:0 -4px 30px rgba(0,0,0,0.15);
+  animation:slideUp 0.25s ease;
+}
+@keyframes slideUp { from{transform:translateY(60px);opacity:0} to{transform:translateY(0);opacity:1} }
+.chat-header {
+  padding:16px 20px 12px; display:flex; align-items:center; justify-content:space-between;
+  border-bottom:1px solid #F0EAD6;
+}
+.chat-header-title { font-size:16px; font-weight:900; color:#333; }
+.chat-header-sub { font-size:11px; color:#aaa; font-weight:600; margin-top:1px; }
+.chat-close {
+  background:none; border:none; font-size:20px; cursor:pointer; color:#bbb; padding:4px;
+}
+.chat-msgs {
+  flex:1; overflow-y:auto; padding:14px 16px; display:flex; flex-direction:column; gap:10px;
+  min-height:80px;
+}
+.chat-bubble {
+  max-width:85%; padding:10px 14px; border-radius:18px; font-size:14px; font-weight:600; line-height:1.45;
+}
+.chat-bubble.user { align-self:flex-end; background:#6C5CE7; color:#fff; border-radius:18px 18px 4px 18px; }
+.chat-bubble.ai   { align-self:flex-start; background:#F5F3FF; color:#333; border-radius:18px 18px 18px 4px; }
+.chat-bubble.ai .apply-btn {
+  margin-top:10px; display:block; background:#6C5CE7; color:#fff; border:none;
+  border-radius:12px; padding:8px 16px; font-size:13px; font-weight:800;
+  cursor:pointer; font-family:'Nunito',sans-serif; width:100%;
+}
+.chat-bubble.ai .apply-btn:hover { background:#5a4bd1; }
+.chat-typing { font-size:22px; letter-spacing:2px; align-self:flex-start; padding:8px 14px; }
+.chat-input-row {
+  padding:12px 16px 20px; display:flex; gap:8px; border-top:1px solid #F0EAD6;
+}
+.chat-input {
+  flex:1; border:2px solid #E8E0CC; border-radius:20px;
+  padding:10px 16px; font-size:14px; font-weight:600; font-family:'Nunito',sans-serif;
+  outline:none; background:#FAFAFA;
+}
+.chat-input:focus { border-color:#6C5CE7; background:#fff; }
+.chat-send {
+  background:#6C5CE7; color:#fff; border:none; border-radius:20px;
+  padding:10px 18px; font-size:14px; font-weight:800; cursor:pointer;
+  font-family:'Nunito',sans-serif;
+}
+.chat-send:disabled { opacity:0.4; cursor:default; }
 </style>
 </head>
 <body>
@@ -537,6 +601,29 @@ body { font-family: 'Nunito', system-ui, sans-serif; background: #FFF8EE; min-he
 
 <!-- MAIN CONTENT -->
 <div class="main-content" id="main-content"></div>
+
+<!-- AI CHAT FAB -->
+<button class="chat-fab" onclick="openChat()" title="Schedule assistant">✏️</button>
+
+<!-- AI CHAT PANEL -->
+<div class="chat-overlay" id="chat-overlay" onclick="if(event.target===this)closeChat()">
+  <div class="chat-panel">
+    <div class="chat-header">
+      <div>
+        <div class="chat-header-title">✏️ Schedule Assistant</div>
+        <div class="chat-header-sub">Ask me to change Evelyn's schedule</div>
+      </div>
+      <button class="chat-close" onclick="closeChat()">✕</button>
+    </div>
+    <div class="chat-msgs" id="chat-msgs">
+      <div class="chat-bubble ai">Hi LA! Tell me what you'd like to change — e.g. "Make Jun 30 a free day" or "Move coding from Thu to Fri this week."</div>
+    </div>
+    <div class="chat-input-row">
+      <input class="chat-input" id="chat-input" placeholder="What would you like to change?" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendChat()}">
+      <button class="chat-send" id="chat-send" onclick="sendChat()">Send</button>
+    </div>
+  </div>
+</div>
 
 <!-- LEGEND -->
 <div class="task-legend">
@@ -895,12 +982,25 @@ function daysUntilSummer() {
   return Math.round((s-n)/86400000);
 }
 
+// ── DAY OVERRIDES (AI-applied schedule changes) ──
+function effectiveDay(wi,di){
+  const base=WEEKS[wi].days[di];
+  const ov=(S.overrides||{})[base.date];
+  return ov ? {...base,...ov} : base;
+}
+function applyAIOverrides(overrides){
+  if(!overrides||!Object.keys(overrides).length) return;
+  if(!S.overrides) S.overrides={};
+  Object.assign(S.overrides, overrides);
+  save(); render();
+}
+
 // ── KEYS ──
 const tk     = (wi,di,t) => `${wi}_${di}_${t}`;
 const ixlKey = (id) => `ixl_${id}`;
 const isDone = (wi,di,t) => !!S[tk(wi,di,t)];
 const isDayDone = (wi,di) => {
-  const d=WEEKS[wi].days[di];
+  const d=effectiveDay(wi,di);
   if(d.free) return true;
   if(d.makeup) return getMakeupTasks(wi).length===0;
   const regularDone=(d.tasks||[]).every(t=>isDone(wi,di,t));
@@ -1044,7 +1144,7 @@ function toggle(wi,di,t,evt){
     const cx=r.left+r.width/2, cy=r.top+r.height/2;
     spawnConfetti(cx,cy);
     showMiniPraise(cx,cy);
-    const willFinish=(WEEKS[wi].days[di].tasks||[]).filter(x=>x!==t).every(x=>isDone(wi,di,x));
+    const willFinish=(effectiveDay(wi,di).tasks||[]).filter(x=>x!==t).every(x=>isDone(wi,di,x));
     if(willFinish) setTimeout(showDayToast,380);
   }
   S[tk(wi,di,t)]=checking;
@@ -1054,7 +1154,8 @@ function toggle(wi,di,t,evt){
 // ── MAKEUP DAY HELPERS ──
 function getMakeupTasks(wi){
   const result=[];
-  WEEKS[wi].days.forEach((day,di)=>{
+  WEEKS[wi].days.forEach((_,di)=>{
+    const day=effectiveDay(wi,di);
     if(day.makeup||day.free) return;
     (day.tasks||[]).forEach(t=>{
       if(!isDone(wi,di,t)&&!isPostponed(wi,di,t)) result.push({wi,di,t,day});
@@ -1374,7 +1475,7 @@ function renderWkTabs(){
 // ── RENDER DAY DETAIL ──
 function renderDayDetail(wi, di){
   const el=document.getElementById("main-content");
-  const day=WEEKS[wi].days[di];
+  const day=effectiveDay(wi,di);
   const locked=isLocked(wi);
   const isTodayDay=isToday(day.date);
   const hasNonfiction=(day.tasks||[]).includes('nonfiction');
@@ -1641,7 +1742,8 @@ function renderWeekView(){
 
   const grid=document.getElementById("days-grid");
   grid.innerHTML="";
-  wk.days.forEach((d,di)=>{
+  wk.days.forEach((_,di)=>{
+    const d=effectiveDay(wi,di);
     const dayDone=isDayDone(wi,di);
     const cls=["day",d.free?"is-free":"",(!d.free&&dayDone)?"complete":"",locked?"is-locked":"",isToday(d.date)?"is-today":""].filter(Boolean).join(" ");
     let html=`<div class="${cls}" onclick="selectDay(${wi},${di},event)" style="cursor:pointer" ondragover="event.preventDefault();this.style.outline='2px dashed #6C5CE7'" ondragleave="this.style.outline=''" ondrop="this.style.outline='';dropTask(event,'${d.date}')">
@@ -1778,6 +1880,76 @@ function checkPw(){
 }
 if(sessionStorage.getItem('pw_ok')==='1'){
   document.getElementById('pw-gate').remove();
+}
+
+// ── AI CHAT ──
+let chatHistory = [];
+
+function openChat(){
+  document.getElementById('chat-overlay').classList.add('open');
+  document.getElementById('chat-input').focus();
+}
+function closeChat(){
+  document.getElementById('chat-overlay').classList.remove('open');
+}
+
+function chatAddBubble(role, html, pendingOverrides){
+  const msgs = document.getElementById('chat-msgs');
+  const div = document.createElement('div');
+  div.className = `chat-bubble ${role}`;
+  div.innerHTML = html;
+  if(pendingOverrides && Object.keys(pendingOverrides).length){
+    const btn = document.createElement('button');
+    btn.className = 'apply-btn';
+    btn.textContent = '✓ Apply changes';
+    btn.onclick = () => {
+      applyAIOverrides(pendingOverrides);
+      btn.textContent = '✓ Applied!';
+      btn.disabled = true;
+      btn.style.background = '#00B894';
+    };
+    div.appendChild(btn);
+  }
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+  return div;
+}
+
+async function sendChat(){
+  const input = document.getElementById('chat-input');
+  const sendBtn = document.getElementById('chat-send');
+  const msg = input.value.trim();
+  if(!msg) return;
+
+  input.value = '';
+  sendBtn.disabled = true;
+  chatAddBubble('user', msg);
+
+  // Typing indicator
+  const typing = chatAddBubble('ai', '⋯');
+  typing.className = 'chat-typing';
+
+  try {
+    const currentSchedule = S.overrides || {};
+    const res = await fetch('/api/chat', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ message: msg, history: chatHistory, currentSchedule })
+    });
+    const data = await res.json();
+    typing.remove();
+
+    chatAddBubble('ai', data.reply || 'Done!', data.overrides);
+    chatHistory.push({role:'user', content: msg});
+    chatHistory.push({role:'assistant', content: data.reply || ''});
+    // Keep history short
+    if(chatHistory.length > 20) chatHistory = chatHistory.slice(-20);
+  } catch(e) {
+    typing.remove();
+    chatAddBubble('ai', '⚠️ Something went wrong. Try again?');
+  }
+  sendBtn.disabled = false;
+  input.focus();
 }
 
 // ── INIT ──
