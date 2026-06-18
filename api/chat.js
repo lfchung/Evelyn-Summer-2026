@@ -90,8 +90,10 @@ The "reply" should be warm, short, and parent-friendly (LA is the one chatting, 
   const text = data.content?.[0]?.text || '{}';
 
   let parsed;
-  try { parsed = JSON.parse(text); }
-  catch { parsed = { reply: text }; }
+  try {
+    const cleaned = text.replace(/^```(?:json)?\s*/,'').replace(/\s*```$/,'').trim();
+    parsed = JSON.parse(cleaned);
+  } catch { parsed = { reply: text }; }
 
   res.json(parsed);
 }
