@@ -758,6 +758,7 @@ const T = {
   violin:    { en:"Violin",     zh:"小提琴",   min:"20分", color:"#d4a017", emoji:"🎻", note:"use Trala" },
   reading:   { en:"Fiction",    zh:"故事閱讀",  min:"25分", color:"#a29bfe", emoji:"📕" },
   nonfiction:{ en:"Nonfiction", zh:"科普閱讀",  min:"20分", color:"#00cec9", emoji:"📰" },
+  typing:    { en:"Typing",     zh:"打字練習",  min:"10分", color:"#fd79a8", emoji:"⌨️" },
 };
 const DOW_ZH = {Mon:"週一",Tue:"週二",Wed:"週三",Thu:"週四",Fri:"週五",Sat:"週六",Sun:"週日"};
 
@@ -814,10 +815,10 @@ const WEEKS = [
   ]},
   { label:"第2週", dates:"Jun 22–28", days:[
     {dow:"Mon",date:"Jun 22",tasks:["piano","coding","math","reading","chinese"]},
-    {dow:"Tue",date:"Jun 23",camp:"swim",campTime:"all day",tasks:["reading"]},
+    {dow:"Tue",date:"Jun 23",camp:"swim",campTime:"all day",tasks:["reading","typing"]},
     {dow:"Wed",date:"Jun 24",tasks:["violin","reading","chinese","nonfiction"]},
-    {dow:"Thu",date:"Jun 25",tasks:["piano","coding","reading","chinese"]},
-    {dow:"Fri",date:"Jun 26",tasks:["math","reading","chinese","nonfiction"]},
+    {dow:"Thu",date:"Jun 25",tasks:["piano","coding","reading","chinese","typing"]},
+    {dow:"Fri",date:"Jun 26",tasks:["violin","math","reading","chinese","nonfiction"]},
     {dow:"Sat",date:"Jun 27",tasks:["piano","math","reading","chinese","nonfiction"]},
     {dow:"Sun",date:"Jun 28",makeup:true},
   ]},
@@ -1392,7 +1393,7 @@ function showToast(msg){
 function hideToast(){ document.getElementById('addtask-toast').style.display='none'; }
 
 // ── TREASURE CHEST ──
-const TASK_GEMS = { piano:"🔮", math:"💎", coding:"🌟", chinese:"🏮", violin:"⭐", reading:"💖", nonfiction:"🫧" };
+const TASK_GEMS = { piano:"🔮", math:"💎", coding:"🌟", chinese:"🏮", violin:"⭐", reading:"💖", nonfiction:"🫧", typing:"⌨️" };
 
 function getTotalGems(){
   let n=0;
