@@ -1509,6 +1509,26 @@ function renderDayDetail(wi, di){
   // ── Makeup Day ──
   if(day.makeup){
     const pending=getMakeupTasks(wi);
+
+    // Day's own tasks (e.g. Diary) — shown first
+    if((day.tasks||[]).length>0){
+      html+=`<div style="margin-bottom:14px">
+        <div style="font-size:13px;font-weight:800;color:#aaa;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:10px">🌸 今天 Today</div>
+        <div class="big-tasks">`;
+      day.tasks.forEach(t=>{
+        const checked=isDone(wi,di,t);
+        const def=T[t];
+        html+=`<div class="big-task${checked?' done-task':''}" onclick="toggle(${wi},${di},'${t}',event)">
+          <div class="big-cb${checked?' on':''}"><span class="big-cb-mark">✓</span></div>
+          <div class="big-t-info">
+            <div class="big-t-en${checked?' done':''}" style="color:${checked?'#ccc':def.color}">${def.emoji} ${def.zh}</div>
+            <div class="big-t-zh${checked?' done':''}">${def.en} <span class="big-t-min">${def.min}</span></div>
+          </div>
+        </div>`;
+      });
+      html+=`</div></div>`;
+    }
+
     if(pending.length===0){
       html+=`<div class="free-today">
         <div class="free-today-icon">🎉</div>
@@ -1553,22 +1573,6 @@ function renderDayDetail(wi, di){
         }
       });
       html+=`</div></div>`;
-    }
-    // Day's own tasks (e.g. Diary)
-    if((day.tasks||[]).length>0){
-      html+=`<div style="margin-top:10px;display:flex;flex-direction:column;gap:8px">`;
-      day.tasks.forEach(t=>{
-        const checked=isDone(wi,di,t);
-        const def=T[t];
-        html+=`<div class="big-task${checked?' done-task':''}" onclick="toggle(${wi},${di},'${t}',event)">
-          <div class="big-cb${checked?' on':''}"><span class="big-cb-mark">✓</span></div>
-          <div class="big-t-info">
-            <div class="big-t-en${checked?' done':''}" style="color:${checked?'#ccc':def.color}">${def.emoji} ${def.zh}</div>
-            <div class="big-t-zh${checked?' done':''}">${def.en} <span class="big-t-min">${def.min}</span></div>
-          </div>
-        </div>`;
-      });
-      html+=`</div>`;
     }
     // Custom tasks on makeup day
     const makeupCustom=getCustomTasks(day.date);
