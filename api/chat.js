@@ -15,6 +15,7 @@ TASK TYPES (use exactly these keys):
 - reading   📕 English Fiction (25 min) — daily
 - chinese   📖 Chinese Reading (25 min) — daily
 - nonfiction 📰 Nonfiction (20 min) — Wed/Fri/Sat
+- diary     📔 Diary writing (15 min) — Sundays
 
 DATE FORMAT: "Jun 22", "Jul 4" (always month abbrev + day, no year)
 

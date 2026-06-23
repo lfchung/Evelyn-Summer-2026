@@ -758,7 +758,7 @@ const T = {
   violin:    { en:"Violin",     zh:"小提琴",   min:"20分", color:"#d4a017", emoji:"🎻", note:"use Trala" },
   reading:   { en:"Fiction",    zh:"故事閱讀",  min:"25分", color:"#a29bfe", emoji:"📕" },
   nonfiction:{ en:"Nonfiction", zh:"科普閱讀",  min:"20分", color:"#00cec9", emoji:"📰" },
-  typing:    { en:"Typing",     zh:"打字練習",  min:"10分", color:"#fd79a8", emoji:"⌨️" },
+  diary:     { en:"Diary",      zh:"寫日記",    min:"15分", color:"#fd79a8", emoji:"📔" },
 };
 const DOW_ZH = {Mon:"週一",Tue:"週二",Wed:"週三",Thu:"週四",Fri:"週五",Sat:"週六",Sun:"週日"};
 
@@ -811,16 +811,16 @@ const WEEKS = [
     {dow:"Thu",date:"Jun 18",camp:"swim",campTime:"9–12p",tasks:["piano","coding","reading","chinese"]},
     {dow:"Fri",date:"Jun 19",camp:"swim",campTime:"9–12p",tasks:["math","reading","chinese","nonfiction"]},
     {dow:"Sat",date:"Jun 20",tasks:["piano","math","reading","chinese","nonfiction"]},
-    {dow:"Sun",date:"Jun 21",makeup:true},
+    {dow:"Sun",date:"Jun 21",makeup:true,tasks:["diary"]},
   ]},
   { label:"第2週", dates:"Jun 22–28", days:[
-    {dow:"Mon",date:"Jun 22",tasks:["piano","coding","math","reading","chinese","typing"]},
+    {dow:"Mon",date:"Jun 22",tasks:["piano","coding","math","reading","chinese"]},
     {dow:"Tue",date:"Jun 23",camp:"swim",campTime:"all day",tasks:["reading"]},
     {dow:"Wed",date:"Jun 24",tasks:["violin","reading","chinese","nonfiction"]},
-    {dow:"Thu",date:"Jun 25",tasks:["piano","coding","reading","chinese","typing"]},
+    {dow:"Thu",date:"Jun 25",tasks:["piano","coding","reading","chinese"]},
     {dow:"Fri",date:"Jun 26",tasks:["math","reading","chinese","nonfiction"]},
     {dow:"Sat",date:"Jun 27",tasks:["piano","math","reading","chinese","nonfiction"]},
-    {dow:"Sun",date:"Jun 28",makeup:true},
+    {dow:"Sun",date:"Jun 28",makeup:true,tasks:["diary"]},
   ]},
   { label:"第3週", dates:"Jun 29–Jul 5", days:[
     {dow:"Mon",date:"Jun 29",tasks:["piano","math","reading","chinese"]},
@@ -838,7 +838,7 @@ const WEEKS = [
     {dow:"Thu",date:"Jul 9",tasks:["piano","coding","reading","chinese"]},
     {dow:"Fri",date:"Jul 10",tasks:["math","reading","chinese","nonfiction"]},
     {dow:"Sat",date:"Jul 11",tasks:["piano","math","reading","chinese","nonfiction"]},
-    {dow:"Sun",date:"Jul 12",makeup:true},
+    {dow:"Sun",date:"Jul 12",makeup:true,tasks:["diary"]},
   ]},
   { label:"第5週", dates:"Jul 13–19", days:[
     {dow:"Mon",date:"Jul 13",tasks:["piano","math","reading","chinese"]},
@@ -847,7 +847,7 @@ const WEEKS = [
     {dow:"Thu",date:"Jul 16",tasks:["piano","coding","reading","chinese"]},
     {dow:"Fri",date:"Jul 17",tasks:["math","reading","chinese","nonfiction"]},
     {dow:"Sat",date:"Jul 18",tasks:["piano","math","reading","chinese","nonfiction"]},
-    {dow:"Sun",date:"Jul 19",makeup:true},
+    {dow:"Sun",date:"Jul 19",makeup:true,tasks:["diary"]},
   ]},
   { label:"第6週", dates:"Jul 20–26", days:[
     {dow:"Mon",date:"Jul 20",camp:"tennis",campTime:"9–12p",tasks:["piano","math","reading","chinese"]},
@@ -856,7 +856,7 @@ const WEEKS = [
     {dow:"Thu",date:"Jul 23",camp:"tennis",campTime:"9–12p",tasks:["piano","coding","reading","chinese"]},
     {dow:"Fri",date:"Jul 24",camp:"tennis",campTime:"9–12p",tasks:["math","reading","chinese","nonfiction"]},
     {dow:"Sat",date:"Jul 25",tasks:["piano","math","reading","chinese","nonfiction"]},
-    {dow:"Sun",date:"Jul 26",makeup:true},
+    {dow:"Sun",date:"Jul 26",makeup:true,tasks:["diary"]},
   ]},
   { label:"第7週", dates:"Jul 27–29", days:[
     {dow:"Mon",date:"Jul 27",tasks:["piano","math","reading","chinese"]},
@@ -1003,10 +1003,10 @@ const isDone = (wi,di,t) => !!S[tk(wi,di,t)];
 const isDayDone = (wi,di) => {
   const d=effectiveDay(wi,di);
   if(d.free) return true;
-  if(d.makeup) return getMakeupTasks(wi).length===0;
-  const regularDone=(d.tasks||[]).every(t=>isDone(wi,di,t));
+  const ownDone=(d.tasks||[]).every(t=>isDone(wi,di,t));
   const customDone=getCustomTasks(d.date).every(ct=>!!S[ct.id]);
-  return regularDone && customDone;
+  if(d.makeup) return getMakeupTasks(wi).length===0 && ownDone;
+  return ownDone && customDone;
 };
 const isIxlDone = (id) => !!S[ixlKey(id)];
 const getIxlCount = () => IXL_FLAT.filter(m=>isIxlDone(m.id)).length;
@@ -1395,7 +1395,7 @@ function showToast(msg){
 function hideToast(){ document.getElementById('addtask-toast').style.display='none'; }
 
 // ── TREASURE CHEST ──
-const TASK_GEMS = { piano:"🔮", math:"💎", coding:"🌟", chinese:"🏮", violin:"⭐", reading:"💖", nonfiction:"🫧", typing:"⌨️" };
+const TASK_GEMS = { piano:"🔮", math:"💎", coding:"🌟", chinese:"🏮", violin:"⭐", reading:"💖", nonfiction:"🫧", diary:"🌸" };
 
 function getTotalGems(){
   let n=0;
@@ -1553,6 +1553,22 @@ function renderDayDetail(wi, di){
         }
       });
       html+=`</div></div>`;
+    }
+    // Day's own tasks (e.g. Diary)
+    if((day.tasks||[]).length>0){
+      html+=`<div style="margin-top:10px;display:flex;flex-direction:column;gap:8px">`;
+      day.tasks.forEach(t=>{
+        const checked=isDone(wi,di,t);
+        const def=T[t];
+        html+=`<div class="big-task${checked?' done-task':''}" onclick="toggle(${wi},${di},'${t}',event)">
+          <div class="big-cb${checked?' on':''}"><span class="big-cb-mark">✓</span></div>
+          <div class="big-t-info">
+            <div class="big-t-en${checked?' done':''}" style="color:${checked?'#ccc':def.color}">${def.emoji} ${def.zh}</div>
+            <div class="big-t-zh${checked?' done':''}">${def.en} <span class="big-t-min">${def.min}</span></div>
+          </div>
+        </div>`;
+      });
+      html+=`</div>`;
     }
     // Custom tasks on makeup day
     const makeupCustom=getCustomTasks(day.date);
@@ -1768,7 +1784,9 @@ function renderWeekView(){
 
     if(d.makeup){
       const pending=getMakeupTasks(wi);
-      if(pending.length===0){
+      const ownPending=(d.tasks||[]).filter(t=>!isDone(wi,di,t));
+      const totalPending=pending.length+ownPending.length;
+      if(totalPending===0){
         html+=`<div class="day-free-body">
           <div class="day-free-icon">🎉</div>
           <div class="day-free-zh">全部完成！</div>
@@ -1778,7 +1796,7 @@ function renderWeekView(){
         html+=`<div class="day-free-body">
           <div class="day-free-icon">🔄</div>
           <div class="day-free-zh">補課日</div>
-          <div class="day-free-en">${pending.length} task${pending.length>1?'s':''} to catch up</div>
+          <div class="day-free-en">${totalPending} task${totalPending>1?'s':''} to catch up</div>
         </div>`;
       }
     } else if(d.free){
