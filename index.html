@@ -1788,9 +1788,22 @@ function renderWeekView(){
 
     if(d.makeup){
       const pending=getMakeupTasks(wi);
-      const ownPending=(d.tasks||[]).filter(t=>!isDone(wi,di,t));
-      const totalPending=pending.length+ownPending.length;
-      if(totalPending===0){
+      // Day's own tasks (e.g. Diary) shown as normal task rows
+      if((d.tasks||[]).length>0){
+        html+=`<div class="tasks" style="margin-bottom:8px">`;
+        d.tasks.forEach(t=>{
+          const checked=isDone(wi,di,t);
+          const def=T[t];
+          html+=`<div class="task" onclick="toggle(${wi},${di},'${t}',event)">
+            <div class="cb${checked?" on":""}"><span class="cb-mark">✓</span></div>
+            <div class="t-info">
+              <div class="t-en${checked?" done":""}" style="color:${checked?"#ccc":def.color}">${def.emoji} ${def.zh} <span class="t-min">${def.min}</span></div>
+            </div>
+          </div>`;
+        });
+        html+=`</div>`;
+      }
+      if(pending.length===0){
         html+=`<div class="day-free-body">
           <div class="day-free-icon">🎉</div>
           <div class="day-free-zh">全部完成！</div>
@@ -1800,7 +1813,7 @@ function renderWeekView(){
         html+=`<div class="day-free-body">
           <div class="day-free-icon">🔄</div>
           <div class="day-free-zh">補課日</div>
-          <div class="day-free-en">${totalPending} task${totalPending>1?'s':''} to catch up</div>
+          <div class="day-free-en">${pending.length} task${pending.length>1?'s':''} to catch up</div>
         </div>`;
       }
     } else if(d.free){
