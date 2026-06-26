@@ -974,7 +974,7 @@ function getCurrentWeekIdx() {
 function getTodayInfo() {
   for(let wi=0;wi<WEEKS.length;wi++)
     for(let di=0;di<WEEKS[wi].days.length;di++)
-      if(isToday(WEEKS[wi].days[di].date)) return {wi,di,day:WEEKS[wi].days[di]};
+      if(isToday(WEEKS[wi].days[di].date)) return {wi,di,day:effectiveDay(wi,di)};
   return null;
 }
 function daysUntilSummer() {
@@ -1400,7 +1400,8 @@ const TASK_GEMS = { piano:"🔮", math:"💎", coding:"🌟", chinese:"🏮", vi
 
 function getTotalGems(){
   let n=0;
-  WEEKS.forEach((wk,wi)=>wk.days.forEach((day,di)=>{
+  WEEKS.forEach((wk,wi)=>wk.days.forEach((_,di)=>{
+    const day=effectiveDay(wi,di);
     if(day.free) return;
     (day.tasks||[]).forEach(t=>{ if(isDone(wi,di,t)) n++; });
     getCustomTasks(day.date).forEach(ct=>{ if(S[ct.id]) n++; });
@@ -1409,7 +1410,7 @@ function getTotalGems(){
 }
 
 function renderChestWidget(wi, di){
-  const day = WEEKS[wi].days[di];
+  const day = effectiveDay(wi, di);
   if(day.free) return '';
   const tasks = day.tasks || [];
   const totalGems = getTotalGems();
