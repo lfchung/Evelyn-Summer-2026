@@ -1095,7 +1095,8 @@ function postponeTask(wi,di,t,evt){
 // ── ACTIONS ──
 function spinForTask(wi,di){
   const day=effectiveDay(wi,di);
-  const pendingRegular=(day.tasks||[]).filter(t=>!isDone(wi,di,t)&&!isPostponed(wi,di,t));
+  const bedtimeLocked=isToday(day.date) && new Date().getHours()<19;
+  const pendingRegular=(day.tasks||[]).filter(t=>!isDone(wi,di,t)&&!isPostponed(wi,di,t)&&!(bedtimeLocked&&t==='reading'));
   const pendingCustom=getCustomTasks(day.date).filter(ct=>!S[ct.id]).map(ct=>ct.id);
   const pending=[...pendingRegular,...pendingCustom];
   if(pending.length===0) return;
