@@ -884,6 +884,15 @@ function getDayIxlSkill(day){
 // ── STATE ──
 const SK = "evelyn_s26_v4";
 let S = JSON.parse(localStorage.getItem(SK)||"{}");
+// One-time migration: clear stale overrides for dates now hardcoded in WEEKS
+(()=>{
+  const stale=["Jul 3","Jul 5"];
+  if(S.overrides){
+    let changed=false;
+    stale.forEach(d=>{ if(S.overrides[d]){ delete S.overrides[d]; changed=true; } });
+    if(changed) localStorage.setItem(SK, JSON.stringify(S));
+  }
+})();
 
 // ── GOOGLE SHEETS SYNC ──
 const SHEET_URL = "https://script.google.com/macros/s/AKfycbzPnIZO_xF0ZC4_qqBOXWB1zneANpGSLN9yfnaLYzHE0cRXbIO_B1BfeYAkdLxWlEmhXw/exec";
