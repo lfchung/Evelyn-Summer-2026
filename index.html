@@ -883,16 +883,17 @@ function getDayIxlSkill(day){
 
 // ── STATE ──
 const SK = "evelyn_s26_v4";
+// Dates whose schedule is now hardcoded in WEEKS — any stale AI-chat overrides
+// for these must be dropped (locally AND from what we pull off the Sheet).
+const STALE_OVERRIDE_DATES = ["Jul 3","Jul 5"];
+function pruneStaleOverrides(state){
+  if(!state || !state.overrides) return false;
+  let changed=false;
+  STALE_OVERRIDE_DATES.forEach(d=>{ if(state.overrides[d]){ delete state.overrides[d]; changed=true; } });
+  return changed;
+}
 let S = JSON.parse(localStorage.getItem(SK)||"{}");
-// One-time migration: clear stale overrides for dates now hardcoded in WEEKS
-(()=>{
-  const stale=["Jul 3","Jul 5"];
-  if(S.overrides){
-    let changed=false;
-    stale.forEach(d=>{ if(S.overrides[d]){ delete S.overrides[d]; changed=true; } });
-    if(changed) localStorage.setItem(SK, JSON.stringify(S));
-  }
-})();
+if(pruneStaleOverrides(S)) localStorage.setItem(SK, JSON.stringify(S));
 
 // ── GOOGLE SHEETS SYNC ──
 const SHEET_URL = "https://script.google.com/macros/s/AKfycbzPnIZO_xF0ZC4_qqBOXWB1zneANpGSLN9yfnaLYzHE0cRXbIO_B1BfeYAkdLxWlEmhXw/exec";
@@ -940,7 +941,11 @@ async function pullFromSheet(){
     const remote = await res.json();
     if(remote && !remote.error){
       S = mergeState(S, remote);
+      const wasStale = pruneStaleOverrides(S);
       localStorage.setItem(SK, JSON.stringify(S));
+      // If the Sheet still had stale overrides, push the cleaned state back
+      // so other devices stop re-seeding them.
+      if(wasStale) pushToSheet();
     }
     setSyncStatus("ok");
   } catch(e){ setSyncStatus("err"); }
